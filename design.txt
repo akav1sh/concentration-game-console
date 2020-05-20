@@ -1,0 +1,45 @@
+Program
+public static void Main()
+private void runApp()
+
+GameManager
+private eGameType m_Type
+private Board m_Board
+private Player m_Player1
+private Player? m_Player2
+private bool isGameOver()
+public void PlayGame()
+private bool isValidCell(string i_CellToCheck)
+public enum eGameType
+{
+NonChosen,
+VSPlayer,
+VSComputer,	
+}
+private string computerChooseCell()
+private int extractXCoordinate()
+private int extractYCoordinate()
+
+
+Player
+private string m_Name
+int m_Score
+
+GameUI
+public void ShowBoard(Board i_Board)
+public string GetCellFromUser()
+public void DisplayMsgToUser(string i_Msg)
+
+
+Board<T>
+public static readonly sr_MinSize = 4
+public static readonly sr_MaxSize = 6
+private Cell<T>[,] m_Board
+private readonly int r_Height
+private readonly int r_Width
+private int m_HiddenCellPairsAmount
+
+Cell<T>
+private bool m_State
+private T m_Content
+
