@@ -6,7 +6,8 @@ namespace B20_Ex02
     {
         public static void Main()
         {
-            Console.WriteLine("Running!");
+           GameUI gameUI = new GameUI();
+           gameUI.RunGame();
         }
     }
 }
