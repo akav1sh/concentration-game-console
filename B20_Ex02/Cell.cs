@@ -1,34 +1,21 @@
-﻿using System;
-
-namespace B20_Ex02
+﻿namespace B20_Ex02
 {
     public class Cell<T>
     {
+        private readonly T r_Content;
         private bool m_Visible;
-        private T m_Content;
-
-        public Cell()
-        {
-            m_Visible = false;
-            m_Content = default;
-        }
 
         public Cell(T i_Content)
         {
+            r_Content = i_Content;
             m_Visible = false;
-            m_Content = i_Content;
         }
 
         public T Content
         {
             get
             {
-                return m_Content;
-            }
-
-            set
-            {
-                m_Content = value;
+                return r_Content;
             }
         }
 

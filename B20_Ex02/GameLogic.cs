@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace B20_Ex02
+﻿namespace B20_Ex02
 {
     public class GameLogic
     {
@@ -69,33 +67,46 @@ namespace B20_Ex02
             m_Board = new GameBoard(i_Height, i_Width);
         }
 
-        public bool IsValidCell(string i_CellToCheck) // TODO
+        public bool IsValidCellInput(string i_CellToCheck)
         {
-            bool isValidCell = true;
-            int column = extractColumn(i_CellToCheck[0]);
-            int row = extractRow(i_CellToCheck[1]);
+            bool isValidCell;
+
+            if (i_CellToCheck.Length != 2 || !char.IsUpper(i_CellToCheck[0]) || !char.IsDigit(i_CellToCheck[1]))
+            {
+                isValidCell = false;
+            }
+            else
+            {
+                int column = ExtractColumn(i_CellToCheck[0]);
+                int row = ExtractRow(i_CellToCheck[1]);
+                isValidCell = column >= 0 && column <= m_Board.Width - 1 && row >= 0 && row <= m_Board.Height - 1;
+            }
 
             return isValidCell;
         }
 
-        public bool IsValidBoardSize(string i_UserInputSize)
+        public bool IsValidName(string i_NameToCheck)
         {
-           return int.TryParse(i_UserInputSize, out int boardSize)
-                   && boardSize >= m_Board.MinSize && boardSize <= m_Board.MaxSize;
+            return string.IsNullOrEmpty(i_NameToCheck);
         }
 
-        public void ExtractCell(string i_Cell, out int o_Column, out int o_Row)
+        public bool isValidGameModeSelection(string i_GameMode)
         {
-            o_Column = extractColumn(i_Cell[0]);
-            o_Row = extractRow(i_Cell[1]);
+            return int.TryParse(i_GameMode, out int mode) && ((eGameMode)mode == eGameMode.PlayerVsComputer || (eGameMode)mode == eGameMode.PlayerVsComputer);
         }
 
-        private int extractColumn(char i_Column)
+        public bool IsValidRowOrColumnSize(string i_Size)
+        {
+           return int.TryParse(i_Size, out int size)
+                   && size >= m_Board.MinRowOrColumnSize && size <= m_Board.MaxRowOrColumnSize;
+        }
+
+        public int ExtractColumn(char i_Column)
         {
             return i_Column - 'A';
         }
 
-        private int extractRow(char i_Row)
+        public int ExtractRow(char i_Row)
         {
             return int.Parse(i_Row.ToString()) - 1;
         }
@@ -113,11 +124,6 @@ namespace B20_Ex02
         public bool IsGameOver() // TODO
         {
             return false;
-        }
-
-        public bool IsCellVisible(int i_Row, int i_Column)
-        {
-            return m_Board.Board[i_Row, i_Column].Visible;
         }
     }
 }

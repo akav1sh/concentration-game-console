@@ -1,14 +1,12 @@
-﻿using System;
-
-namespace B20_Ex02
+﻿namespace B20_Ex02
 {
     public class GameBoard
     {
-        private const int k_MinSize = 16;
-        private const int k_MaxSize = 36;
+        private const int k_MinRowOrColumnSize = 4;
+        private const int k_MaxRowOrColumnSize = 6;
         private readonly int r_Height;
         private readonly int r_Width;
-        private readonly Cell<char>[,] r_Board = null;
+        private readonly Cell<char>[,] r_Board;
         private int m_HiddenCellsAmount;
 
         public GameBoard(int i_Height, int i_Width)
@@ -28,19 +26,19 @@ namespace B20_Ex02
             }
         }
 
-        public int MinSize
+        public int MinRowOrColumnSize
         {
             get
             {
-                return k_MinSize;
+                return k_MinRowOrColumnSize;
             }
         }
 
-        public int MaxSize
+        public int MaxRowOrColumnSize
         {
             get
             {
-                return k_MaxSize;
+                return k_MaxRowOrColumnSize;
             }
         }
 
@@ -66,11 +64,6 @@ namespace B20_Ex02
             {
                 return m_HiddenCellsAmount;
             }
-        }
-
-        public void SetCellContent(int i_Row, int i_Column, char i_Content)
-        {
-            r_Board[i_Row, i_Column].Content = i_Content;
         }
 
         public void SetCellState(int i_Row, int i_Column, bool i_Visible)
