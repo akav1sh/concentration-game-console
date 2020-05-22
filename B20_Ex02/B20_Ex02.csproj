@@ -33,6 +33,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Cell.cs" />
+    <Compile Include="GameUI.cs" />
+    <Compile Include="GameBoard.cs" />
+    <Compile Include="GameLogic.cs" />
+    <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
   </ItemGroup>
   <ItemGroup>

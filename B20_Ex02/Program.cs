@@ -1,5 +1,4 @@
 ﻿using System;
-using Ex02.ConsoleUtils;
 
 namespace B20_Ex02
 {
@@ -7,8 +6,8 @@ namespace B20_Ex02
     {
         public static void Main()
         {
-            Screen.Clear();
-            Console.WriteLine("Running!");
+           GameUI gameUI = new GameUI();
+           gameUI.RunGame();
         }
     }
 }
