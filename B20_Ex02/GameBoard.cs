@@ -2,8 +2,8 @@
 {
     public class GameBoard
     {
-        private const int k_MinRowOrColumnSize = 4;
-        private const int k_MaxRowOrColumnSize = 6;
+        private const int k_MinHeightOrWidth = 4;
+        private const int k_MaxHeightOrWidth = 6;
         private readonly int r_Height;
         private readonly int r_Width;
         private readonly Cell<char>[,] r_Board;
@@ -26,19 +26,19 @@
             }
         }
 
-        public int MinRowOrColumnSize
+        public int MinHeightOrWidth
         {
             get
             {
-                return k_MinRowOrColumnSize;
+                return k_MinHeightOrWidth;
             }
         }
 
-        public int MaxRowOrColumnSize
+        public int MaxHeightOrWidth
         {
             get
             {
-                return k_MaxRowOrColumnSize;
+                return k_MaxHeightOrWidth;
             }
         }
 
