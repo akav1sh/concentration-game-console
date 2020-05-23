@@ -10,19 +10,21 @@ namespace B20_Ex02
 
         public void RunGame() // TODO
         {
+            Console.WriteLine("Welcome to the Concentration Game!{0}", Environment.NewLine);
             Player firstPlayer = new Player(getPlayerName("Please enter your name: "));
-            Player opponent = getOpponent(out GameLogic.eGameMode gameMode);
-            m_GameLogic = new GameLogic(firstPlayer, opponent, gameMode);
-            createBoard();
-            displayBoard(m_GameLogic.Board);
+            Player secondPlayer = getOpponent(out GameLogic.eGameMode gameMode);
+            m_GameLogic = new GameLogic(firstPlayer, secondPlayer, gameMode);
+
+            createNewBoard();
+            displayBoard();
         }
 
         private Player getOpponent(out GameLogic.eGameMode io_GameMode)
         {
             Player opponent;
             io_GameMode = getGameModeFromUser();
-
-            if(io_GameMode == GameLogic.eGameMode.PlayerVsPlayer)
+            
+            if (io_GameMode == GameLogic.eGameMode.PlayerVsPlayer)
             {
                 opponent = new Player(getPlayerName("Please enter second player name: "));
             }
@@ -34,21 +36,21 @@ namespace B20_Ex02
             return opponent;
         }
 
-        private void createBoard()
+        private void createNewBoard()
         {
-            string requestMessageToUser = "Please enter the board size you prefer(Min 4x4, Max 6x6, even amount of cells): ";
-            bool isValidBoardSize = false;
+            string msgToUser = "Please enter the board size you prefer (minimum 4x4, maximum 6x6, even amount of cells):";
+            bool validBoardSize = false;
             int parsedHeight = 0, parsedWidth = 0;
 
-            while (!isValidBoardSize)
+            while (!validBoardSize)
             {
-                Console.WriteLine(requestMessageToUser);
-                Console.WriteLine("Height: ");
+                Console.WriteLine(msgToUser);
+                Console.Write("Height: ");
                 string height = Console.ReadLine();
-                Console.WriteLine("Width: ");
+                Console.Write("Width: ");
                 string width = Console.ReadLine();
 
-                isValidBoardSize = m_GameLogic.IsValidBoardSize(height, width);
+                validBoardSize = m_GameLogic.IsValidBoardSize(height, width);
                 if (m_GameLogic.IsValidBoardSize(height, width))
                 {
                     parsedHeight = int.Parse(height);
@@ -56,112 +58,112 @@ namespace B20_Ex02
                 }
                 else
                 {
-                    Console.WriteLine("Wrong board size entered!");
+                    Console.WriteLine("Wrong board size entered!{0}", Environment.NewLine);
                 }
             }
 
-            m_GameLogic.SetNewBoard(parsedHeight, parsedWidth);
+            m_GameLogic.SetBoard(parsedHeight, parsedWidth);
         }
         
-        private void displayBoard(GameBoard i_Board)
+        private void displayBoard()
         {
-            Screen.Clear();
-            StringBuilder outBoard = new StringBuilder();
-            string lineSeparator = makeLineSeparator(i_Board);
-            outBoard.Append("  ");
-            for(int i = 0; i < i_Board.Width; i++)
+            GameBoard gameBoard = m_GameLogic.Board;
+            StringBuilder boardToDisplay = new StringBuilder();
+            string lineSeparator = makeLineSeparator(gameBoard);
+
+            boardToDisplay.Append("  ");
+            for (int i = 0; i < gameBoard.Width; i++)
             {
-                outBoard.AppendFormat("  {0} ", (char)('A' + i));
+                boardToDisplay.AppendFormat("  {0} ", (char)('A' + i));
             }
 
-            outBoard.Append(Environment.NewLine);
-            outBoard.Append(lineSeparator);
-            for (int i = 0; i < i_Board.Height; i++)
+            boardToDisplay.Append(Environment.NewLine).Append(lineSeparator);
+            for (int i = 0; i < gameBoard.Height; i++)
             {
-                outBoard.AppendFormat("{0}{1} |", Environment.NewLine, i + 1);
-                for(int j = 0; j < i_Board.Width; j++)
+                boardToDisplay.AppendFormat("{0}{1} |", Environment.NewLine, i + 1);
+                for (int j = 0; j < gameBoard.Width; j++)
                 {
                     string cell = " ";
-                    if (i_Board.Board[i, j].Visible)
+                    if (gameBoard.Board[i, j].Visible)
                     {
-                        cell = i_Board.Board[i, j].Content.ToString();
+                        cell = gameBoard.Board[i, j].Content.ToString();
                     }
 
-                    outBoard.AppendFormat(" {0} |", cell);
+                    boardToDisplay.AppendFormat(" {0} |", cell);
                 }
 
-                outBoard.Append(Environment.NewLine);
-                outBoard.Append(lineSeparator);
+                boardToDisplay.Append(Environment.NewLine).Append(lineSeparator);
             }
 
-            Console.WriteLine(outBoard.ToString());
+            Screen.Clear();
+            Console.WriteLine(boardToDisplay.ToString());
         }
 
-        private void getCellFromUser(out int o_Row, out int o_Column) // TODO
+        private void getCellFromUser(out int o_Row, out int o_Column)
         {
-            string requestMessageToUser = "Please enter wanted cell (for example: \"A4\"): ";
-            Console.Write(requestMessageToUser);
-            string receivedLine = Console.ReadLine();
+            string msgToUser = "Please enter wanted cell (for example: \"A4\"): ";
+            Console.Write(msgToUser);
+            string userInput = Console.ReadLine();
 
-            while(!m_GameLogic.IsValidCellInput(receivedLine, out GameLogic.eInputCellStatus cellStatus))
+            while(!m_GameLogic.IsValidInputCell(userInput, out GameLogic.eInputCellStatus cellStatus))
             {
-                switch(cellStatus)
+                switch (cellStatus)
                 {
                     case GameLogic.eInputCellStatus.InvalidCellFormat:
-                        Console.WriteLine("Wrong format entered!");
+                        Console.WriteLine("Wrong format entered!{0}", Environment.NewLine);
                         break;
-                    case GameLogic.eInputCellStatus.InvalidCellBorders:
-                        Console.WriteLine("Cell outside of board entered!");
+                    case GameLogic.eInputCellStatus.InvalidCellBounds:
+                        Console.WriteLine("Cell outside of board bounds entered!{0}", Environment.NewLine);
                         break;
                     case GameLogic.eInputCellStatus.VisibleCell:
-                        Console.WriteLine("Cell outside of board entered!");
+                        Console.WriteLine("Cell outside of board entered!{0}", Environment.NewLine);
                         break;
                     default:
-                        Console.WriteLine("Bye Bye cya next time!");
+                        Console.WriteLine("Bye Bye... see you next time!");
                         Environment.Exit(0);
                         break;
                 }
 
-                Console.Write(requestMessageToUser);
-                receivedLine = Console.ReadLine();
+                Console.Write(msgToUser);
+                userInput = Console.ReadLine();
             }
 
-            o_Row = m_GameLogic.ExtractRow(receivedLine[1]);
-            o_Column = m_GameLogic.ExtractColumn(receivedLine[0]);
+            o_Column = m_GameLogic.ExtractColumn(userInput[0]);
+            o_Row = m_GameLogic.ExtractRow(userInput[1]);
         }
 
-        private GameLogic.eGameMode getGameModeFromUser() // TODO
+        private GameLogic.eGameMode getGameModeFromUser()
         {
-            string requestMessageToUser = string.Format(
-                @"
-1. PlayerVsPlayer
-2. PlayerVsComputer
-Please enter the game mode you prefer: ");
-            Console.Write(requestMessageToUser);
-            string receivedLine = Console.ReadLine();
+            string msgToUser = string.Format(
+@"Please select the game mode you prefer:
+(1) Player Vs. Player
+(2) Player Vs. Computer
+Your selection: ");
+            Console.Write(msgToUser);
+            string userInput = Console.ReadLine();
 
-            while (!GameLogic.IsValidGameModeSelection(receivedLine))
+            while (!GameLogic.IsValidGameModeSelection(userInput))
             {
-                Console.WriteLine("Wrong mode selected!");
-                Console.Write(requestMessageToUser);
-                receivedLine = Console.ReadLine();
+                Console.WriteLine("Wrong mode selected!{0}", Environment.NewLine);
+                Console.Write(msgToUser);
+                userInput = Console.ReadLine();
             }
 
-            return (GameLogic.eGameMode)int.Parse(receivedLine);
+            return (GameLogic.eGameMode)int.Parse(userInput);
         }
 
-        private string getPlayerName(string i_MessageToDisplay) // TODO
+        private string getPlayerName(string i_MsgToDisplay)
         {
-            Console.Write(i_MessageToDisplay);
-            string receivedLine = Console.ReadLine();
+            Console.Write(i_MsgToDisplay);
+            string userInput = Console.ReadLine();
 
-            while (!GameLogic.IsValidName(receivedLine))
+            while (!GameLogic.IsValidName(userInput))
             {
-                Console.Write(i_MessageToDisplay);
-                receivedLine = Console.ReadLine();
+                Console.Write(i_MsgToDisplay);
+                userInput = Console.ReadLine();
             }
 
-            return receivedLine;
+            return userInput;
         }
 
         private string makeLineSeparator(GameBoard i_Board)
@@ -169,7 +171,7 @@ Please enter the game mode you prefer: ");
             StringBuilder lineSeparator = new StringBuilder();
 
             lineSeparator.Append("  =");
-            for(int i = 0; i < i_Board.Width; i++)
+            for (int i = 0; i < i_Board.Width; i++)
             {
                 lineSeparator.Append("===");
                 lineSeparator.Append("=");

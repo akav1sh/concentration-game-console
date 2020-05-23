@@ -9,7 +9,7 @@ namespace B20_Ex02
         private readonly eGameMode r_Mode;
         private Player m_CurrentPlayer;
         private GameBoard m_Board;
-        public static readonly Random sr_ComputerRandomizer = new Random();
+        internal static readonly Random sr_RandGenerator = new Random();
         
         public GameLogic(Player i_Player1, Player i_Player2, eGameMode i_GameMode)
         {
@@ -28,7 +28,7 @@ namespace B20_Ex02
         public enum eInputCellStatus
         {
             InvalidCellFormat,
-            InvalidCellBorders,
+            InvalidCellBounds,
             VisibleCell,
             QuitGame,
             ValidCell
@@ -88,7 +88,7 @@ namespace B20_Ex02
 
         public static bool IsValidName(string i_NameToCheck)
         {
-            return !string.IsNullOrEmpty(i_NameToCheck);
+            return string.IsNullOrEmpty(i_NameToCheck) == false;
         }
 
         public static bool IsValidGameModeSelection(string i_GameMode)
@@ -96,80 +96,80 @@ namespace B20_Ex02
             return int.TryParse(i_GameMode, out int mode) && ((eGameMode)mode == eGameMode.PlayerVsPlayer || (eGameMode)mode == eGameMode.PlayerVsComputer);
         }
 
-        public void SetNewBoard(int i_Height, int i_Width)
+        public void SetBoard(int i_Height, int i_Width)
         {
             m_Board = new GameBoard(i_Height, i_Width);
         }
 
-        public bool IsValidCellInput(string i_CellToCheck, out eInputCellStatus o_Status)
+        public bool IsValidInputCell(string i_CellToCheck, out eInputCellStatus o_Status)
         {
-            bool isValidCell;
+            bool validCell;
 
             if (i_CellToCheck == "Q")
             {
-                isValidCell = false;
+                validCell = false;
                 o_Status = eInputCellStatus.QuitGame;
             }
             else
             {
-                if (i_CellToCheck.Length != 2 || !char.IsUpper(i_CellToCheck[0]) || !char.IsDigit(i_CellToCheck[1]))
+                if (i_CellToCheck.Length != 2 || !char.IsUpper(i_CellToCheck[0]) || 
+                    !char.IsDigit(i_CellToCheck[1]))
                 {
-                    isValidCell = false;
+                    validCell = false;
                     o_Status = eInputCellStatus.InvalidCellFormat;
                 }
                 else
                 {
                     int column = ExtractColumn(i_CellToCheck[0]);
                     int row = ExtractRow(i_CellToCheck[1]);
-                    if (!(column >= 0 && column <= m_Board.Width - 1 && row >= 0 &&
-                          row <= m_Board.Height - 1))
+                    if (column < 0 || column > m_Board.Width - 1 || row < 0 || row > m_Board.Height - 1)
                     {
-                        isValidCell = false;
-                        o_Status = eInputCellStatus.InvalidCellBorders;
+                        validCell = false;
+                        o_Status = eInputCellStatus.InvalidCellBounds;
                     }
                     else
                     {
                         if (IsCellVisible(row, column))
                         {
-                            isValidCell = false;
+                            validCell = false;
                             o_Status = eInputCellStatus.VisibleCell;
                         }
                         else
                         {
-                            isValidCell = true;
+                            validCell = true;
                             o_Status = eInputCellStatus.ValidCell;
                         }
                     }
                 }
             }
 
-            return isValidCell;
+            return validCell;
         }
 
         public bool IsValidBoardSize(string i_Height, string i_Width)
         {
-            bool isValidBoardSize;
-            bool isValidHeight = int.TryParse(i_Height, out int height);
-            bool isValidWidth = int.TryParse(i_Width, out int width);
+            bool validBoardSize;
+            bool validHeight = int.TryParse(i_Height, out int height);
+            bool validWidth = int.TryParse(i_Width, out int width);
 
-            if (!isValidHeight || !isValidWidth)
+            if (!validHeight || !validWidth)
             {
-                isValidBoardSize = false;
+                validBoardSize = false;
             }
             else
             {
-                if (height < GameBoard.sr_MinHeightOrWidth || height > GameBoard.sr_MaxHeightOrWidth ||
-                    width < GameBoard.sr_MinHeightOrWidth || width > GameBoard.sr_MaxHeightOrWidth)
+                if (height < GameBoard.k_MinHeightOrWidth || height > GameBoard.k_MaxHeightOrWidth ||
+                    width < GameBoard.k_MinHeightOrWidth || width > GameBoard.k_MaxHeightOrWidth)
                 {
-                    isValidBoardSize = false;
+                    validBoardSize = false;
                 }
                 else
                 {
-                    isValidBoardSize = (height * width) % 2 == 0;
+                    validBoardSize = (height * width) % 2 == 0;
                 }
             }
 
-            return isValidBoardSize;
+            return validBoardSize;
         }
 
         public int ExtractColumn(char i_Column)
@@ -182,22 +182,21 @@ namespace B20_Ex02
             return int.Parse(i_Row.ToString()) - 1;
         }
 
-        public void SetPlayerForNextMove(Player i_Player)
+        public void SetCurrentPlayerToPlay(Player i_Player)
         {
             m_CurrentPlayer = i_Player;
         }
 
         public void ChooseComputerCell(out int o_ChosenRow, out int o_ChosenColumn)
         {
-            m_CurrentPlayer = r_Player2;
             int randomRow, randomColumn;
             const bool v_Visible = true;
 
             while (true)
             {
-                randomRow = sr_ComputerRandomizer.Next(0, m_Board.Height);
-                randomColumn = sr_ComputerRandomizer.Next(0, m_Board.Width);
-                if (IsCellVisible(randomRow, randomColumn) == false)
+                randomRow = sr_RandGenerator.Next(0, m_Board.Height);
+                randomColumn = sr_RandGenerator.Next(0, m_Board.Width);
+                if (!IsCellVisible(randomRow, randomColumn))
                 {
                     o_ChosenRow = randomColumn;
                     o_ChosenColumn = randomColumn;
@@ -212,22 +211,27 @@ namespace B20_Ex02
             return m_Board.Board[i_Row, i_Column].Visible;
         }
 
+        private bool areAllCellsVisible()
+        {
+            return m_Board.HiddenCellsAmount == 0;
+        }
+
         public bool IsGameOver(out eGameOverStatus o_Status)
         {
-            bool isGameOver;
+            bool gameOver;
 
-            if (m_Board.AreAllCellsVisible())
+            if (areAllCellsVisible())
             {
-                isGameOver = true;
+                gameOver = true;
                 o_Status = Player1.Score == Player2.Score ? eGameOverStatus.Tie : eGameOverStatus.Win;
             }
             else
             {
-                isGameOver = false;
+                gameOver = false;
                 o_Status = eGameOverStatus.GameNotOver;
             }
 
-            return isGameOver;
+            return gameOver;
         }
     }
 }
