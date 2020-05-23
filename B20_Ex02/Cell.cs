@@ -3,12 +3,16 @@
     public class Cell<T>
     {
         private readonly T r_Content;
+        private readonly int r_Row;
+        private readonly int r_Column;
         private bool m_Visible;
 
-        public Cell(T i_Content)
+        public Cell(T i_Content, int i_Row, int i_Column)
         {
             r_Content = i_Content;
             m_Visible = false;
+            r_Row = i_Row;
+            r_Column = i_Column;
         }
 
         public T Content
@@ -29,6 +33,22 @@
             set
             {
                 m_Visible = value;
+            }
+        }
+
+        public int Row
+        {
+            get
+            {
+                return r_Row;
+            }
+        }
+
+        public int Column
+        {
+            get
+            {
+                return r_Column;
             }
         }
     }

@@ -7,9 +7,9 @@ namespace B20_Ex02
         private readonly Player r_Player1;
         private readonly Player r_Player2;
         private readonly eGameMode r_Mode;
-        private readonly Random r_ComputerRand = new Random();
         private Player m_CurrentPlayer;
         private GameBoard m_Board;
+        public static readonly Random sr_ComputerRandomizer = new Random();
         
         public GameLogic(Player i_Player1, Player i_Player2, eGameMode i_GameMode)
         {
@@ -79,6 +79,21 @@ namespace B20_Ex02
             {
                 return m_CurrentPlayer;
             }
+
+            set
+            {
+                m_CurrentPlayer = value;
+            }
+        }
+
+        public static bool IsValidName(string i_NameToCheck)
+        {
+            return !string.IsNullOrEmpty(i_NameToCheck);
+        }
+
+        public static bool IsValidGameModeSelection(string i_GameMode)
+        {
+            return int.TryParse(i_GameMode, out int mode) && ((eGameMode)mode == eGameMode.PlayerVsPlayer || (eGameMode)mode == eGameMode.PlayerVsComputer);
         }
 
         public void SetNewBoard(int i_Height, int i_Width)
@@ -92,7 +107,7 @@ namespace B20_Ex02
 
             if (i_CellToCheck == "Q")
             {
-                isValidCell = true;
+                isValidCell = false;
                 o_Status = eInputCellStatus.QuitGame;
             }
             else
@@ -131,16 +146,6 @@ namespace B20_Ex02
             return isValidCell;
         }
 
-        public bool IsValidName(string i_NameToCheck)
-        {
-            return string.IsNullOrEmpty(i_NameToCheck);
-        }
-
-        public bool isValidGameModeSelection(string i_GameMode)
-        {
-            return int.TryParse(i_GameMode, out int mode) && ((eGameMode)mode == eGameMode.PlayerVsPlayer || (eGameMode)mode == eGameMode.PlayerVsComputer);
-        }
-
         public bool IsValidBoardSize(string i_Height, string i_Width)
         {
             bool isValidBoardSize;
@@ -153,7 +158,15 @@ namespace B20_Ex02
             }
             else
             {
-                isValidBoardSize = (height * width) % 2 == 0;
+                if (height < GameBoard.sr_MinHeightOrWidth || height > GameBoard.sr_MaxHeightOrWidth ||
+                    width < GameBoard.sr_MinHeightOrWidth || width > GameBoard.sr_MaxHeightOrWidth)
+                {
+                    isValidBoardSize = false;
+                }
+                else
+                {
+                    isValidBoardSize = (height * width) % 2 == 0;
+                }
             }
 
             return isValidBoardSize;
@@ -182,8 +195,8 @@ namespace B20_Ex02
 
             while (true)
             {
-                randomRow = r_ComputerRand.Next(0, m_Board.Height);
-                randomColumn = r_ComputerRand.Next(0, m_Board.Width);
+                randomRow = sr_ComputerRandomizer.Next(0, m_Board.Height);
+                randomColumn = sr_ComputerRandomizer.Next(0, m_Board.Width);
                 if (IsCellVisible(randomRow, randomColumn) == false)
                 {
                     o_ChosenRow = randomColumn;
