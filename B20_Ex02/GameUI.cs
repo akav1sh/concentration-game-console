@@ -86,7 +86,7 @@ namespace B20_Ex02
                     string cell = " ";
                     if (gameBoard.Board[i, j].IsVisible)
                     {
-                        cell = gameBoard.Board[i, j].Content.ToString();
+                        cell = gameBoard[i, j].ToString();
                     }
 
                     boardToDisplay.AppendFormat(" {0} |", cell);

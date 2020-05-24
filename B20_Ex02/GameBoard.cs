@@ -28,6 +28,14 @@ namespace B20_Ex02
             }
         }
 
+        public char this[int i_Row, int i_Column]
+        {
+            get
+            {
+                return r_Board[i_Row, i_Column].Content;
+            }
+        }
+
         public int Height
         {
             get
