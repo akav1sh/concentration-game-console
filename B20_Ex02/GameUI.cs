@@ -39,10 +39,10 @@ namespace B20_Ex02
         private void createNewBoard()
         {
             string msgToUser = "Please enter the board size you prefer (minimum 4x4, maximum 6x6, even amount of cells):";
-            bool validBoardSize = false;
+            bool isValidBoardSize = false;
             int parsedHeight = 0, parsedWidth = 0;
 
-            while (!validBoardSize)
+            while (!isValidBoardSize)
             {
                 Console.WriteLine(msgToUser);
                 Console.Write("Height: ");
@@ -50,7 +50,7 @@ namespace B20_Ex02
                 Console.Write("Width: ");
                 string width = Console.ReadLine();
 
-                validBoardSize = m_GameLogic.IsValidBoardSize(height, width);
+                isValidBoardSize = m_GameLogic.IsValidBoardSize(height, width);
                 if (m_GameLogic.IsValidBoardSize(height, width))
                 {
                     parsedHeight = int.Parse(height);
@@ -84,7 +84,7 @@ namespace B20_Ex02
                 for (int j = 0; j < gameBoard.Width; j++)
                 {
                     string cell = " ";
-                    if (gameBoard.Board[i, j].Visible)
+                    if (gameBoard.Board[i, j].IsVisible)
                     {
                         cell = gameBoard.Board[i, j].Content.ToString();
                     }

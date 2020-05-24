@@ -5,12 +5,12 @@
         private readonly T r_Content;
         private readonly int r_Row;
         private readonly int r_Column;
-        private bool m_Visible;
+        private bool m_IsVisible;
 
         public Cell(T i_Content, int i_Row, int i_Column)
         {
             r_Content = i_Content;
-            m_Visible = false;
+            m_IsVisible = false;
             r_Row = i_Row;
             r_Column = i_Column;
         }
@@ -23,16 +23,16 @@
             }
         }
 
-        public bool Visible
+        public bool IsVisible
         {
             get
             {
-                return m_Visible;
+                return m_IsVisible;
             }
 
             set
             {
-                m_Visible = value;
+                m_IsVisible = value;
             }
         }
 

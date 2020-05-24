@@ -52,10 +52,10 @@ namespace B20_Ex02
             }
         }
 
-        public void SetCellState(int i_Row, int i_Column, bool i_Visible)
+        public void SetCellState(int i_Row, int i_Column, bool i_ToExpose)
         {
-            r_Board[i_Row, i_Column].Visible = i_Visible;
-            if (i_Visible)
+            r_Board[i_Row, i_Column].IsVisible = i_ToExpose;
+            if (i_ToExpose)
             {
                 m_HiddenCellsAmount--;
             }
@@ -76,9 +76,9 @@ namespace B20_Ex02
             {
                 randContentIndex = GameLogic.sr_RandGenerator.Next(0, cellContents.Count);
                 randContentToAdd = cellContents[randContentIndex];
+                addRandomContentToRandomCell(cellPositions, randContentToAdd);
+                addRandomContentToRandomCell(cellPositions, randContentToAdd);
                 cellContents.RemoveAt(randContentIndex);
-                addRandomContentToRandomCell(cellPositions, randContentToAdd);
-                addRandomContentToRandomCell(cellPositions, randContentToAdd);
             }
         }
 
@@ -87,6 +87,7 @@ namespace B20_Ex02
             int randPosition = GameLogic.sr_RandGenerator.Next(0, i_CellPositions.Count);
             int row = i_CellPositions[randPosition].Row;
             int column = i_CellPositions[randPosition].Column;
+
             r_Board[row, column] = new Cell<char>(i_ContentToAdd, row, column);
             i_CellPositions.RemoveAt(randPosition);
         }
@@ -107,6 +108,7 @@ namespace B20_Ex02
         private List<Cell<char>> createCellPositionsList()
         {
             List<Cell<char>> cellPositions = new List<Cell<char>>(r_Height * r_Width);
+
             for (int i = 0; i < r_Height; i++)
             {
                 for (int j = 0; j < r_Width; j++)

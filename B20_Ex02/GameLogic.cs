@@ -103,11 +103,11 @@ namespace B20_Ex02
 
         public bool IsValidInputCell(string i_CellToCheck, out eInputCellStatus o_Status)
         {
-            bool validCell;
+            bool isValidCell;
 
             if (i_CellToCheck == "Q")
             {
-                validCell = false;
+                isValidCell = false;
                 o_Status = eInputCellStatus.QuitGame;
             }
             else
@@ -115,7 +115,7 @@ namespace B20_Ex02
                 if (i_CellToCheck.Length != 2 || !char.IsUpper(i_CellToCheck[0]) || 
                     !char.IsDigit(i_CellToCheck[1]))
                 {
-                    validCell = false;
+                    isValidCell = false;
                     o_Status = eInputCellStatus.InvalidCellFormat;
                 }
                 else
@@ -124,52 +124,52 @@ namespace B20_Ex02
                     int row = ExtractRow(i_CellToCheck[1]);
                     if (column < 0 || column > m_Board.Width - 1 || row < 0 || row > m_Board.Height - 1)
                     {
-                        validCell = false;
+                        isValidCell = false;
                         o_Status = eInputCellStatus.InvalidCellBounds;
                     }
                     else
                     {
-                        if (m_Board.Board[row, column].Visible)
+                        if (m_Board.Board[row, column].IsVisible)
                         {
-                            validCell = false;
+                            isValidCell = false;
                             o_Status = eInputCellStatus.VisibleCell;
                         }
                         else
                         {
-                            validCell = true;
+                            isValidCell = true;
                             o_Status = eInputCellStatus.ValidCell;
                         }
                     }
                 }
             }
 
-            return validCell;
+            return isValidCell;
         }
 
         public bool IsValidBoardSize(string i_Height, string i_Width)
         {
-            bool validBoardSize;
-            bool validHeight = int.TryParse(i_Height, out int height);
-            bool validWidth = int.TryParse(i_Width, out int width);
+            bool isValidBoardSize;
+            bool isValidHeight = int.TryParse(i_Height, out int height);
+            bool isValidWidth = int.TryParse(i_Width, out int width);
 
-            if (!validHeight || !validWidth)
+            if (!isValidHeight || !isValidWidth)
             {
-                validBoardSize = false;
+                isValidBoardSize = false;
             }
             else
             {
                 if (height < GameBoard.k_MinHeightOrWidth || height > GameBoard.k_MaxHeightOrWidth ||
                     width < GameBoard.k_MinHeightOrWidth || width > GameBoard.k_MaxHeightOrWidth)
                 {
-                    validBoardSize = false;
+                    isValidBoardSize = false;
                 }
                 else
                 {
-                    validBoardSize = (height * width) % 2 == 0;
+                    isValidBoardSize = (height * width) % 2 == 0;
                 }
             }
 
-            return validBoardSize;
+            return isValidBoardSize;
         }
 
         public int ExtractColumn(char i_Column)
@@ -196,7 +196,7 @@ namespace B20_Ex02
             {
                 randomRow = sr_RandGenerator.Next(0, m_Board.Height);
                 randomColumn = sr_RandGenerator.Next(0, m_Board.Width);
-                if (!m_Board.Board[randomRow, randomColumn].Visible)
+                if (!m_Board.Board[randomRow, randomColumn].IsVisible)
                 {
                     o_ChosenRow = randomColumn;
                     o_ChosenColumn = randomColumn;
@@ -206,7 +206,6 @@ namespace B20_Ex02
             }
         }
 
-
         private bool areAllCellsVisible()
         {
             return m_Board.HiddenCellsAmount == 0;
@@ -214,20 +213,20 @@ namespace B20_Ex02
 
         public bool IsGameOver(out eGameOverStatus o_Status)
         {
-            bool gameOver;
+            bool isGameOver;
 
             if (areAllCellsVisible())
             {
-                gameOver = true;
+                isGameOver = true;
                 o_Status = Player1.Score == Player2.Score ? eGameOverStatus.Tie : eGameOverStatus.Win;
             }
             else
             {
-                gameOver = false;
+                isGameOver = false;
                 o_Status = eGameOverStatus.GameNotOver;
             }
 
-            return gameOver;
+            return isGameOver;
         }
     }
 }
