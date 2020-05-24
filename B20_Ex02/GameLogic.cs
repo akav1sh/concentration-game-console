@@ -15,7 +15,7 @@ namespace B20_Ex02
         {
             r_Player1 = i_Player1;
             r_Player2 = i_Player2;
-            m_CurrentPlayer = null;
+            m_CurrentPlayer = i_Player1;
             r_Mode = i_GameMode;
         }
 
@@ -129,7 +129,7 @@ namespace B20_Ex02
                     }
                     else
                     {
-                        if (IsCellVisible(row, column))
+                        if (m_Board.Board[row, column].Visible)
                         {
                             validCell = false;
                             o_Status = eInputCellStatus.VisibleCell;
@@ -196,7 +196,7 @@ namespace B20_Ex02
             {
                 randomRow = sr_RandGenerator.Next(0, m_Board.Height);
                 randomColumn = sr_RandGenerator.Next(0, m_Board.Width);
-                if (!IsCellVisible(randomRow, randomColumn))
+                if (!m_Board.Board[randomRow, randomColumn].Visible)
                 {
                     o_ChosenRow = randomColumn;
                     o_ChosenColumn = randomColumn;
@@ -206,10 +206,6 @@ namespace B20_Ex02
             }
         }
 
-        public bool IsCellVisible(int i_Row, int i_Column)
-        {
-            return m_Board.Board[i_Row, i_Column].Visible;
-        }
 
         private bool areAllCellsVisible()
         {
