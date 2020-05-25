@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace B20_Ex02
 {
@@ -152,8 +153,8 @@ namespace B20_Ex02
                 }
                 else
                 {
-                    int column = extractColumn(i_CellToCheck[0]);
-                    int row = extractRow(i_CellToCheck[1]);
+                    int column = convertColumnCharToInt(i_CellToCheck[0]);
+                    int row = convertRowCharToInt(i_CellToCheck[1]);
                     if (column < 0 || column > m_Board.Width - 1 || row < 0 || row > m_Board.Height - 1)
                     {
                         isValidMove = false;
@@ -204,20 +205,30 @@ namespace B20_Ex02
             return isValidBoardSize;
         }
 
-        private int extractColumn(char i_Column)
+        private int convertColumnCharToInt(char i_Column)
         {
             return i_Column - 'A';
         }
 
-        private int extractRow(char i_Row)
+        private int convertRowCharToInt(char i_Row)
         {
             return int.Parse(i_Row.ToString()) - 1;
         }
 
+        private char convertColumnIntToChar(int i_Column)
+        {
+            return (char)('A' + i_Column);
+        }
+
+        private char convertRowIntToChar(int i_Row)
+        {
+            return char.Parse((i_Row + 1).ToString());
+        }
+
         public void ToggleCellState(string i_CellToToggle)
         {
-            int column = extractColumn(i_CellToToggle[0]);
-            int row = extractRow(i_CellToToggle[1]);
+            int column = convertColumnCharToInt(i_CellToToggle[0]);
+            int row = convertRowCharToInt(i_CellToToggle[1]);
             bool updatedCellState = !m_Board.Board[row, column].Visible;
 
             m_Board.SetCellState(row, column, updatedCellState);
@@ -225,8 +236,7 @@ namespace B20_Ex02
 
         public bool IsMatch(string i_FirstCell, string i_SecondCell)
         {
-            return m_Board[extractRow(i_FirstCell[1]), extractColumn(i_FirstCell[0])] == 
-                   m_Board[extractRow(i_SecondCell[1]), extractColumn(i_SecondCell[0])];
+            return m_Board[convertRowCharToInt(i_FirstCell[1]), convertColumnCharToInt(i_FirstCell[0])] == m_Board[convertRowCharToInt(i_SecondCell[1]), convertColumnCharToInt(i_SecondCell[0])];
         }
 
         public void TogglePlayer()
@@ -236,14 +246,16 @@ namespace B20_Ex02
 
         public void ResetGame()
         {
+            m_CurrentPlayer = GetWinner();
             Player1.Score = 0;
             Player2.Score = 0;
+            m_GameStatus = eGameStatus.InProcess;
         }
 
-        public void ChooseComputerCell(out int o_ChosenRow, out int o_ChosenColumn)
+        public string ChooseComputerMove()
         {
             int randomRow, randomColumn;
-            const bool v_Visible = true;
+            StringBuilder computerMove = new StringBuilder();
 
             while (true)
             {
@@ -251,12 +263,12 @@ namespace B20_Ex02
                 randomColumn = sr_RandGenerator.Next(0, m_Board.Width);
                 if (!m_Board.Board[randomRow, randomColumn].Visible)
                 {
-                    o_ChosenRow = randomColumn;
-                    o_ChosenColumn = randomColumn;
-                    m_Board.SetCellState(randomRow, randomColumn, v_Visible);
+                    computerMove.Append(convertColumnIntToChar(randomColumn)).Append(convertRowIntToChar(randomRow));
                     break;
                 }
             }
+
+            return computerMove.ToString();
         }
 
         public Player GetWinner()

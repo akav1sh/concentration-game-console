@@ -9,54 +9,51 @@ namespace B20_Ex02
     {
         private GameLogic m_GameLogic;
 
-        public void RunGame() // TODO
+        public void RunGame()
         {
             Console.WriteLine("Welcome to the Concentration Game!{0}", Environment.NewLine);
-            Player firstPlayer = new Player(getPlayerName("Please enter your name: "));
+
+            Player firstPlayer = new Player(getPlayerName("Please enter your name: "), Player.ePlayerType.Human);
             Player secondPlayer = getOpponent(out GameLogic.eGameMode gameMode);
-           
             m_GameLogic = new GameLogic(firstPlayer, secondPlayer, gameMode);
+            
             do
             {
-                startNewGame();
+                newGame();
             }
-            while (playerWantAnotherGame());
+            while (isPlayerWantAnotherGame());
 
             Console.WriteLine("Press any key to exit . . .");
             Console.ReadKey();
         }
 
-        private void startNewGame() // TODO
+        private void newGame()
         {
-            bool isGameOver = false;
-            string firstMove, secondMove;
+            bool toQuit;
+            string firstMove;
+            string secondMove;
 
             createNewBoard();
-            while (!isGameOver)
+            do
             {
-                displayBoard();
-                displayGameScore();
-                displayCurrentPlayerName();
+                displayGameInfo();
 
-                firstMove = getMoveFromPlayer("Please pick the first cell to expose");
-                if (m_GameLogic.GameStatus == GameLogic.eGameStatus.QuitGame)
+                firstMove = executeMove("Please pick the first cell to expose", out toQuit);
+                if (toQuit)
                 {
                     break;
                 }
 
-                m_GameLogic.ToggleCellState(firstMove);
-                displayBoard();
-                
-                secondMove = getMoveFromPlayer("Please pick the second cell to expose - to find a match");
-                if (m_GameLogic.GameStatus == GameLogic.eGameStatus.QuitGame)
+                Console.WriteLine($"Chosen cell: {firstMove}");
+                secondMove = executeMove("Please pick the second cell to expose - to find a match", out toQuit);
+                if (toQuit)
                 {
                     break;
                 }
 
                 checkForMatch(firstMove, secondMove);
-
-                isGameOver = m_GameLogic.IsGameOver();
             }
+            while (!m_GameLogic.IsGameOver());
 
             endGame();
         }
@@ -81,11 +78,8 @@ Environment.NewLine);
 
         private void checkForMatch(string i_FirstMove, string i_SecondMove)
         {
-            m_GameLogic.ToggleCellState(i_SecondMove);
-            displayBoard();
             if (!m_GameLogic.IsMatch(i_FirstMove, i_SecondMove))
             {
-                Thread.Sleep(2000);
                 m_GameLogic.ToggleCellState(i_FirstMove);
                 m_GameLogic.ToggleCellState(i_SecondMove);
                 m_GameLogic.TogglePlayer();
@@ -94,10 +88,13 @@ Environment.NewLine);
             {
                 m_GameLogic.HiddenPairCellsAmount--;
                 m_GameLogic.CurrentPlayer.Score++;
+                Console.WriteLine($"Point to {m_GameLogic.CurrentPlayer.Name}!!!");
             }
+
+            Thread.Sleep(2000);
         }
 
-        private bool playerWantAnotherGame() // TODO
+        private bool isPlayerWantAnotherGame()
         {
             bool startAnotherGame = false;
             ConsoleKey response;
@@ -122,13 +119,48 @@ Environment.NewLine);
             return startAnotherGame;
         }
 
-        private void executeComputerMove() // TODO
+        private string executeMove(string i_MsgToDisplay, out bool io_ToQuit)
         {
+            string move;
+
+            if (m_GameLogic.CurrentPlayer.PlayerType == Player.ePlayerType.Human)
+            {
+                move = getMoveFromPlayer(i_MsgToDisplay);
+            }
+            else
+            {
+                Thread.Sleep(1000);
+                move = m_GameLogic.ChooseComputerMove();
+            }
+
+            io_ToQuit = m_GameLogic.GameStatus == GameLogic.eGameStatus.QuitGame;
+            if (!io_ToQuit)
+            {
+                m_GameLogic.ToggleCellState(move);
+                displayGameInfo();
+            }
+
+            return move;
+        }
+
+        private void displayGameInfo()
+        {
+            displayBoard();
+            displayGameScore();
+
+            if (m_GameLogic.GameStatus != GameLogic.eGameStatus.InProcess)
+            {
+                Console.WriteLine("Game over!");
+            }
+            else
+            {
+                displayCurrentPlayerName();
+            }
         }
 
         private void endGame()
         {
-            Console.WriteLine("Game over!");
+            displayGameInfo();
             switch (m_GameLogic.GameStatus)
             {
                 case GameLogic.eGameStatus.Win:
@@ -147,15 +179,15 @@ Environment.NewLine);
         private Player getOpponent(out GameLogic.eGameMode io_GameMode)
         {
             Player opponent;
-            io_GameMode = getGameModeFromUser();
             
+            io_GameMode = getGameModeFromUser();
             if (io_GameMode == GameLogic.eGameMode.PlayerVsPlayer)
             {
-                opponent = new Player(getPlayerName("Please enter second player name: "));
+                opponent = new Player(getPlayerName("Please enter second player name: "), Player.ePlayerType.Human);
             }
             else
             {
-                opponent = new Player("Computer");
+                opponent = new Player("Computer", Player.ePlayerType.AI);
             }
 
             return opponent;
@@ -282,18 +314,16 @@ Your selection: ");
 
         private string getPlayerName(string i_MsgToDisplay)
         {
-            string userInput;
-            bool isValidName;
+            string playerName;
 
             do
             {
                 Console.Write(i_MsgToDisplay);
-                userInput = Console.ReadLine();
-                isValidName = GameLogic.IsValidName(userInput);
+                playerName = Console.ReadLine().TrimStart();
             }
-            while (!isValidName);
+            while (!GameLogic.IsValidName(playerName));
 
-            return userInput;
+            return playerName;
         }
 
         private string makeLineSeparator()

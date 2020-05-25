@@ -3,12 +3,28 @@
     public class Player
     {
         private readonly string r_Name;
+        private readonly ePlayerType r_PlayerType;
         private int m_Score;
 
-        public Player(string i_PlayerName)
+        public Player(string i_PlayerName, ePlayerType i_PlayerType)
         {
             r_Name = i_PlayerName;
+            r_PlayerType = i_PlayerType;
             m_Score = 0;
+        }
+
+        public enum ePlayerType
+        {
+            Human,
+            AI
+        }
+
+        public ePlayerType PlayerType
+        {
+            get
+            {
+                return r_PlayerType;
+            }
         }
 
         public string Name
