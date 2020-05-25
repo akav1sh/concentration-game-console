@@ -4,8 +4,8 @@ namespace B20_Ex02
 {
     public class GameBoard
     {
-        public const int k_MinHeightOrWidth = 2; // 4!!!!! 
-        public const int k_MaxHeightOrWidth = 4; // 6!!!!!
+        public const int k_MinHeightOrWidth = 4; 
+        public const int k_MaxHeightOrWidth = 6;
         private readonly int r_Height;
         private readonly int r_Width;
         private readonly Cell<char>[,] r_Board;
