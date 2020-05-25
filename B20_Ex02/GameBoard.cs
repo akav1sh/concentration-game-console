@@ -4,19 +4,17 @@ namespace B20_Ex02
 {
     public class GameBoard
     {
-        public const int k_MinHeightOrWidth = 4;
-        public const int k_MaxHeightOrWidth = 6;
+        public const int k_MinHeightOrWidth = 2; // 4!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        public const int k_MaxHeightOrWidth = 2; // 6!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         private readonly int r_Height;
         private readonly int r_Width;
         private readonly Cell<char>[,] r_Board;
-        private int m_HiddenCellsAmount;
 
         public GameBoard(int i_Height, int i_Width)
         {
             r_Height = i_Height;
             r_Width = i_Width;
             r_Board = new Cell<char>[r_Height, r_Width];
-            m_HiddenCellsAmount = r_Height * r_Width;
             initializeBoard();
         }
 
@@ -52,25 +50,9 @@ namespace B20_Ex02
             }
         }
 
-        public int HiddenCellsAmount
+        public void SetCellState(int i_Row, int i_Column, bool i_State)
         {
-            get
-            {
-                return m_HiddenCellsAmount;
-            }
-        }
-
-        public void SetCellState(int i_Row, int i_Column, bool i_ToExpose)
-        {
-            r_Board[i_Row, i_Column].IsVisible = i_ToExpose;
-            if (i_ToExpose)
-            {
-                m_HiddenCellsAmount--;
-            }
-            else
-            {
-                m_HiddenCellsAmount++;
-            }
+            r_Board[i_Row, i_Column].Visible = i_State;
         }
 
         private void initializeBoard()

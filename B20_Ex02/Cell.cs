@@ -23,7 +23,7 @@
             }
         }
 
-        public bool IsVisible
+        public bool Visible
         {
             get
             {

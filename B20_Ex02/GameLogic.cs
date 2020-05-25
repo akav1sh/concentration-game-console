@@ -6,17 +6,21 @@ namespace B20_Ex02
     {
         private readonly Player r_Player1;
         private readonly Player r_Player2;
-        private readonly eGameMode r_Mode;
+        private readonly eGameMode r_GameMode;
+        private eGameStatus m_GameStatus;
         private Player m_CurrentPlayer;
         private GameBoard m_Board;
+        private int m_HiddenPairCellsAmount;
         internal static readonly Random sr_RandGenerator = new Random();
         
-        public GameLogic(Player i_Player1, Player i_Player2, eGameMode i_GameMode)
+        public GameLogic(Player i_Player1, Player i_Player2, eGameMode i_GameGameMode)
         {
             r_Player1 = i_Player1;
             r_Player2 = i_Player2;
             m_CurrentPlayer = i_Player1;
-            r_Mode = i_GameMode;
+            r_GameMode = i_GameGameMode;
+            m_HiddenPairCellsAmount = 0;
+            m_GameStatus = eGameStatus.InProcess;
         }
 
         public enum eGameMode
@@ -25,20 +29,21 @@ namespace B20_Ex02
             PlayerVsComputer = 2
         }
 
-        public enum eInputCellStatus
+        public enum eGameStatus
+        {
+            InProcess,
+            Win,
+            Tie,
+            QuitGame
+        }
+
+        public enum ePlayerMoveStatus
         {
             InvalidCellFormat,
             InvalidCellBounds,
             VisibleCell,
             QuitGame,
             ValidCell
-        }
-
-        public enum eGameOverStatus
-        {
-            Win,
-            Tie,
-            GameNotOver
         }
 
         public GameBoard Board
@@ -49,11 +54,24 @@ namespace B20_Ex02
             }
         }
 
-        public eGameMode Mode
+        public eGameMode GameMode
         {
             get
             {
-                return r_Mode;
+                return r_GameMode;
+            }
+        }
+
+        public eGameStatus GameStatus
+        {
+            get
+            {
+                return m_GameStatus;
+            }
+
+            set
+            {
+                m_GameStatus = value;
             }
         }
 
@@ -86,6 +104,19 @@ namespace B20_Ex02
             }
         }
 
+        public int HiddenPairCellsAmount
+        {
+            get
+            {
+                return m_HiddenPairCellsAmount;
+            }
+
+            set
+            {
+                m_HiddenPairCellsAmount = value;
+            }
+        }
+
         public static bool IsValidName(string i_NameToCheck)
         {
             return string.IsNullOrEmpty(i_NameToCheck) == false;
@@ -99,51 +130,52 @@ namespace B20_Ex02
         public void SetBoard(int i_Height, int i_Width)
         {
             m_Board = new GameBoard(i_Height, i_Width);
+            m_HiddenPairCellsAmount = (i_Height * i_Width) / 2;
         }
 
-        public bool IsValidInputCell(string i_CellToCheck, out eInputCellStatus o_Status)
+        public bool IsValidMove(string i_CellToCheck, out ePlayerMoveStatus o_Status)
         {
-            bool isValidCell;
+            bool isValidMove;
 
-            if (i_CellToCheck == "Q")
+            if (i_CellToCheck == "Q" || i_CellToCheck == "q")
             {
-                isValidCell = false;
-                o_Status = eInputCellStatus.QuitGame;
+                isValidMove = true;
+                o_Status = ePlayerMoveStatus.QuitGame;
             }
             else
             {
                 if (i_CellToCheck.Length != 2 || !char.IsUpper(i_CellToCheck[0]) || 
                     !char.IsDigit(i_CellToCheck[1]))
                 {
-                    isValidCell = false;
-                    o_Status = eInputCellStatus.InvalidCellFormat;
+                    isValidMove = false;
+                    o_Status = ePlayerMoveStatus.InvalidCellFormat;
                 }
                 else
                 {
-                    int column = ExtractColumn(i_CellToCheck[0]);
-                    int row = ExtractRow(i_CellToCheck[1]);
+                    int column = extractColumn(i_CellToCheck[0]);
+                    int row = extractRow(i_CellToCheck[1]);
                     if (column < 0 || column > m_Board.Width - 1 || row < 0 || row > m_Board.Height - 1)
                     {
-                        isValidCell = false;
-                        o_Status = eInputCellStatus.InvalidCellBounds;
+                        isValidMove = false;
+                        o_Status = ePlayerMoveStatus.InvalidCellBounds;
                     }
                     else
                     {
-                        if (m_Board.Board[row, column].IsVisible)
+                        if (m_Board.Board[row, column].Visible)
                         {
-                            isValidCell = false;
-                            o_Status = eInputCellStatus.VisibleCell;
+                            isValidMove = false;
+                            o_Status = ePlayerMoveStatus.VisibleCell;
                         }
                         else
                         {
-                            isValidCell = true;
-                            o_Status = eInputCellStatus.ValidCell;
+                            isValidMove = true;
+                            o_Status = ePlayerMoveStatus.ValidCell;
                         }
                     }
                 }
             }
 
-            return isValidCell;
+            return isValidMove;
         }
 
         public bool IsValidBoardSize(string i_Height, string i_Width)
@@ -172,19 +204,40 @@ namespace B20_Ex02
             return isValidBoardSize;
         }
 
-        public int ExtractColumn(char i_Column)
+        private int extractColumn(char i_Column)
         {
             return i_Column - 'A';
         }
 
-        public int ExtractRow(char i_Row)
+        private int extractRow(char i_Row)
         {
             return int.Parse(i_Row.ToString()) - 1;
         }
 
-        public void SetCurrentPlayerToPlay(Player i_Player)
+        public void ToggleCellState(string i_CellToToggle)
         {
-            m_CurrentPlayer = i_Player;
+            int column = extractColumn(i_CellToToggle[0]);
+            int row = extractRow(i_CellToToggle[1]);
+            bool updatedCellState = !m_Board.Board[row, column].Visible;
+
+            m_Board.SetCellState(row, column, updatedCellState);
+        }
+
+        public bool IsMatch(string i_FirstCell, string i_SecondCell)
+        {
+            return m_Board[extractRow(i_FirstCell[1]), extractColumn(i_FirstCell[0])] == 
+                   m_Board[extractRow(i_SecondCell[1]), extractColumn(i_SecondCell[0])];
+        }
+
+        public void TogglePlayer()
+        {
+            m_CurrentPlayer = m_CurrentPlayer == Player1 ? Player2 : Player1;
+        }
+
+        public void ResetGame()
+        {
+            Player1.Score = 0;
+            Player2.Score = 0;
         }
 
         public void ChooseComputerCell(out int o_ChosenRow, out int o_ChosenColumn)
@@ -196,7 +249,7 @@ namespace B20_Ex02
             {
                 randomRow = sr_RandGenerator.Next(0, m_Board.Height);
                 randomColumn = sr_RandGenerator.Next(0, m_Board.Width);
-                if (!m_Board.Board[randomRow, randomColumn].IsVisible)
+                if (!m_Board.Board[randomRow, randomColumn].Visible)
                 {
                     o_ChosenRow = randomColumn;
                     o_ChosenColumn = randomColumn;
@@ -206,24 +259,31 @@ namespace B20_Ex02
             }
         }
 
-        private bool areAllCellsVisible()
+        public Player GetWinner()
         {
-            return m_Board.HiddenCellsAmount == 0;
+            int winnerScore = Math.Max(r_Player1.Score, r_Player2.Score);
+
+            return Player1.Score == winnerScore ? Player1 : Player2;
         }
 
-        public bool IsGameOver(out eGameOverStatus o_Status)
+        private bool areAllCellsVisible()
+        {
+            return m_HiddenPairCellsAmount == 0;
+        }
+
+        public bool IsGameOver()
         {
             bool isGameOver;
 
             if (areAllCellsVisible())
             {
                 isGameOver = true;
-                o_Status = Player1.Score == Player2.Score ? eGameOverStatus.Tie : eGameOverStatus.Win;
+                m_GameStatus = Player1.Score == Player2.Score ? eGameStatus.Tie : eGameStatus.Win;
             }
             else
             {
                 isGameOver = false;
-                o_Status = eGameOverStatus.GameNotOver;
+                m_GameStatus = eGameStatus.InProcess;
             }
 
             return isGameOver;
