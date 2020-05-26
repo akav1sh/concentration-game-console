@@ -29,33 +29,36 @@ namespace B20_Ex02
 
         private void newGame()
         {
-            bool toQuit;
-            string firstMove;
-            string secondMove;
-
             createNewBoard();
             do
             {
                 displayGameInfo();
 
-                firstMove = executeMove("Please pick the first cell to expose", out toQuit);
+                string firstMove = executeMove("Please pick the first cell to expose", out bool toQuit);
                 if (toQuit)
                 {
                     break;
                 }
 
-                Console.WriteLine($"Chosen cell: {firstMove}");
-                secondMove = executeMove("Please pick the second cell to expose - to find a match", out toQuit);
+                string secondMove = executeMove("Please pick the second cell to expose - to find a match", out toQuit);
                 if (toQuit)
                 {
                     break;
                 }
-
+                
                 checkForMatch(firstMove, secondMove);
             }
             while (!m_GameLogic.IsGameOver());
 
             endGame();
+        }
+
+        private void checkForMatch(string i_FirstMove, string i_SecondMove)
+        {
+            if (m_GameLogic.CheckForMatch(i_FirstMove, i_SecondMove) == false)
+            {
+                Thread.Sleep(2000);
+            }
         }
 
         private void displayGameScore()
@@ -74,24 +77,6 @@ Environment.NewLine);
         private void displayCurrentPlayerName()
         {
             Console.WriteLine($"It's {m_GameLogic.CurrentPlayer.Name}'s turn!");
-        }
-
-        private void checkForMatch(string i_FirstMove, string i_SecondMove)
-        {
-            if (!m_GameLogic.IsMatch(i_FirstMove, i_SecondMove))
-            {
-                m_GameLogic.ToggleCellState(i_FirstMove);
-                m_GameLogic.ToggleCellState(i_SecondMove);
-                m_GameLogic.TogglePlayer();
-            }
-            else
-            {
-                m_GameLogic.HiddenPairCellsAmount--;
-                m_GameLogic.CurrentPlayer.Score++;
-                Console.WriteLine($"Point to {m_GameLogic.CurrentPlayer.Name}!!!");
-            }
-
-            Thread.Sleep(2000);
         }
 
         private bool isPlayerWantAnotherGame()
@@ -164,8 +149,7 @@ Environment.NewLine);
             switch (m_GameLogic.GameStatus)
             {
                 case GameLogic.eGameStatus.Win:
-                    Player winner = m_GameLogic.GetWinner();
-                    Console.WriteLine($"{winner.Name} is the winner! Congratulations!");
+                    Console.WriteLine($"{m_GameLogic.GetWinner().Name} is the winner! Congratulations!");
                     break;
                 case GameLogic.eGameStatus.Tie:
                     Console.WriteLine("It's a tie!");
@@ -180,7 +164,7 @@ Environment.NewLine);
         {
             Player opponent;
             
-            io_GameMode = getGameModeFromUser();
+            io_GameMode = getGameModeFromPlayer();
             if (io_GameMode == GameLogic.eGameMode.PlayerVsPlayer)
             {
                 opponent = new Player(getPlayerName("Please enter second player name: "), Player.ePlayerType.Human);
@@ -196,7 +180,6 @@ Environment.NewLine);
         private void createNewBoard()
         {
             bool isValidBoardSize = false;
-            int parsedHeight = 0, parsedWidth = 0;
 
             while (!isValidBoardSize)
             {
@@ -207,43 +190,36 @@ Environment.NewLine);
                 string width = Console.ReadLine();
 
                 isValidBoardSize = m_GameLogic.IsValidBoardSize(height, width);
-                if (m_GameLogic.IsValidBoardSize(height, width))
+                if (isValidBoardSize)
                 {
-                    parsedHeight = int.Parse(height);
-                    parsedWidth = int.Parse(width);
+                    m_GameLogic.SetBoard(int.Parse(height), int.Parse(width));
                 }
                 else
                 {
                     Console.WriteLine("Wrong board size entered!{0}", Environment.NewLine);
                 }
             }
-
-            m_GameLogic.SetBoard(parsedHeight, parsedWidth);
         }
         
         private void displayBoard()
         {
-            GameBoard gameBoard = m_GameLogic.Board;
             StringBuilder boardToDisplay = new StringBuilder();
             string lineSeparator = makeLineSeparator();
 
             boardToDisplay.Append("  ");
-            for (int i = 0; i < gameBoard.Width; i++)
+            for (int i = 0; i < m_GameLogic.Board.Width; i++)
             {
                 boardToDisplay.AppendFormat("  {0} ", (char)('A' + i));
             }
 
             boardToDisplay.Append(Environment.NewLine).Append(lineSeparator);
-            for (int i = 0; i < gameBoard.Height; i++)
+            for (int i = 0; i < m_GameLogic.Board.Height; i++)
             {
                 boardToDisplay.AppendFormat("{0}{1} |", Environment.NewLine, i + 1);
-                for (int j = 0; j < gameBoard.Width; j++)
+                for (int j = 0; j < m_GameLogic.Board.Width; j++)
                 {
-                    string cell = " ";
-                    if (gameBoard.Board[i, j].Visible)
-                    {
-                        cell = gameBoard[i, j].ToString();
-                    }
+                    string cell = m_GameLogic.IsCellVisible(i, j) ? 
+                        m_GameLogic.Board[i, j].ToString() : " ";
 
                     boardToDisplay.AppendFormat(" {0} |", cell);
                 }
@@ -258,13 +234,13 @@ Environment.NewLine);
         private string getMoveFromPlayer(string i_MsgToDisplay)
         {
             bool isValidMove;
-            string userInput;
+            string moveFromPlayer;
 
             do
             {
                 Console.Write($"{i_MsgToDisplay} (for example: \"A4\") or press \"Q\" to exit: ");
-                userInput = Console.ReadLine();
-                isValidMove = m_GameLogic.IsValidMove(userInput, out GameLogic.ePlayerMoveStatus moveStatus);
+                moveFromPlayer = Console.ReadLine().Trim();
+                isValidMove = m_GameLogic.IsValidMove(moveFromPlayer, out GameLogic.ePlayerMoveStatus moveStatus);
 
                 switch (moveStatus)
                 {
@@ -284,24 +260,24 @@ Environment.NewLine);
             }
             while (!isValidMove);
 
-            return userInput;
+            return moveFromPlayer;
         }
 
-        private GameLogic.eGameMode getGameModeFromUser()
+        private GameLogic.eGameMode getGameModeFromPlayer()
         {
             string msgToUser = string.Format(
 @"Please select the game mode you prefer:
 (1) Player Vs. Player
 (2) Player Vs. Computer
 Your selection: ");
-            string userInput;
+            string gameMode;
             bool isValidGameMode;
 
             do
             {
                 Console.Write(msgToUser);
-                userInput = Console.ReadLine();
-                isValidGameMode = GameLogic.IsValidGameModeSelection(userInput);
+                gameMode = Console.ReadLine();
+                isValidGameMode = GameLogic.IsValidGameModeSelection(gameMode);
                 if (!isValidGameMode)
                 {
                     Console.WriteLine("Wrong mode selected!{0}", Environment.NewLine);
@@ -309,7 +285,7 @@ Your selection: ");
             }
             while (!isValidGameMode);
 
-            return (GameLogic.eGameMode)int.Parse(userInput);
+            return (GameLogic.eGameMode)int.Parse(gameMode);
         }
 
         private string getPlayerName(string i_MsgToDisplay)

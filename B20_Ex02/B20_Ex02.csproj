@@ -38,6 +38,7 @@
     <Compile Include="GameBoard.cs" />
     <Compile Include="GameLogic.cs" />
     <Compile Include="Player.cs" />
+    <Compile Include="Position.cs" />
     <Compile Include="Program.cs" />
   </ItemGroup>
   <ItemGroup>

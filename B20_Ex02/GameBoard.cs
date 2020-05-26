@@ -4,7 +4,7 @@ namespace B20_Ex02
 {
     public class GameBoard
     {
-        public const int k_MinHeightOrWidth = 4; 
+        public const int k_MinHeightOrWidth = 4;
         public const int k_MaxHeightOrWidth = 6;
         private readonly int r_Height;
         private readonly int r_Width;
@@ -58,7 +58,7 @@ namespace B20_Ex02
         private void initializeBoard()
         {
             List<char> cellContents = createCellsContentsList();
-            List<Cell<char>> cellPositions = createCellPositionsList();
+            List<Position> cellPositions = createCellPositionsList();
             int randContentIndex;
             char randContentToAdd;
 
@@ -72,19 +72,20 @@ namespace B20_Ex02
             }
         }
 
-        private void addRandomContentToRandomCell(List<Cell<char>> i_CellPositions, char i_ContentToAdd)
+        private void addRandomContentToRandomCell(List<Position> i_CellPositions, char i_ContentToAdd)
         {
             int randPosition = GameLogic.sr_RandGenerator.Next(0, i_CellPositions.Count);
             int row = i_CellPositions[randPosition].Row;
             int column = i_CellPositions[randPosition].Column;
 
-            r_Board[row, column] = new Cell<char>(i_ContentToAdd, row, column);
+            r_Board[row, column] = new Cell<char>(i_ContentToAdd, new Position(row, column));
             i_CellPositions.RemoveAt(randPosition);
         }
 
         private List<char> createCellsContentsList()
         {
-            List<char> cellContents = new List<char>(26);
+            const int k_UpperCaseLettersAmount = 26;
+            List<char> cellContents = new List<char>(k_UpperCaseLettersAmount);
             char letter = 'A';
 
             for (int i = 0; i < cellContents.Capacity; i++, letter++)
@@ -95,15 +96,15 @@ namespace B20_Ex02
             return cellContents;
         }
 
-        private List<Cell<char>> createCellPositionsList()
+        private List<Position> createCellPositionsList()
         {
-            List<Cell<char>> cellPositions = new List<Cell<char>>(r_Height * r_Width);
+            List<Position> cellPositions = new List<Position>(r_Height * r_Width);
 
             for (int i = 0; i < r_Height; i++)
             {
                 for (int j = 0; j < r_Width; j++)
                 {
-                    cellPositions.Add(new Cell<char>(default, i, j));
+                    cellPositions.Add(new Position(i, j));
                 }
             }
 

@@ -3,16 +3,14 @@
     public class Cell<T>
     {
         private readonly T r_Content;
-        private readonly int r_Row;
-        private readonly int r_Column;
+        private readonly Position r_Position;
         private bool m_IsVisible;
 
-        public Cell(T i_Content, int i_Row, int i_Column)
+        public Cell(T i_Content, Position i_Position)
         {
             r_Content = i_Content;
+            r_Position = i_Position;
             m_IsVisible = false;
-            r_Row = i_Row;
-            r_Column = i_Column;
         }
 
         public T Content
@@ -36,19 +34,11 @@
             }
         }
 
-        public int Row
+        public Position Position
         {
             get
             {
-                return r_Row;
-            }
-        }
-
-        public int Column
-        {
-            get
-            {
-                return r_Column;
+                return r_Position;
             }
         }
     }

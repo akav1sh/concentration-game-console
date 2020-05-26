@@ -18,10 +18,11 @@ namespace B20_Ex02
         {
             r_Player1 = i_Player1;
             r_Player2 = i_Player2;
-            m_CurrentPlayer = i_Player1;
             r_GameMode = i_GameGameMode;
-            m_HiddenPairCellsAmount = 0;
             m_GameStatus = eGameStatus.InProcess;
+            m_CurrentPlayer = i_Player1;
+            m_Board = null;
+            m_HiddenPairCellsAmount = 0;
         }
 
         public enum eGameMode
@@ -111,11 +112,6 @@ namespace B20_Ex02
             {
                 return m_HiddenPairCellsAmount;
             }
-
-            set
-            {
-                m_HiddenPairCellsAmount = value;
-            }
         }
 
         public static bool IsValidName(string i_NameToCheck)
@@ -128,6 +124,16 @@ namespace B20_Ex02
             return int.TryParse(i_GameMode, out int mode) && ((eGameMode)mode == eGameMode.PlayerVsPlayer || (eGameMode)mode == eGameMode.PlayerVsComputer);
         }
 
+        public bool IsCellVisible(int i_Row, int i_Column)
+        {
+            return m_Board.Board[i_Row, i_Column].Visible;
+        }
+
+        private bool areAllCellsVisible()
+        {
+            return m_HiddenPairCellsAmount == 0;
+        }
+
         public void SetBoard(int i_Height, int i_Width)
         {
             m_Board = new GameBoard(i_Height, i_Width);
@@ -138,7 +144,7 @@ namespace B20_Ex02
         {
             bool isValidMove;
 
-            if (i_CellToCheck == "Q" || i_CellToCheck == "q")
+            if (i_CellToCheck == "Q")
             {
                 isValidMove = true;
                 o_Status = ePlayerMoveStatus.QuitGame;
@@ -182,10 +188,8 @@ namespace B20_Ex02
         public bool IsValidBoardSize(string i_Height, string i_Width)
         {
             bool isValidBoardSize;
-            bool isValidHeight = int.TryParse(i_Height, out int height);
-            bool isValidWidth = int.TryParse(i_Width, out int width);
 
-            if (!isValidHeight || !isValidWidth)
+            if (!int.TryParse(i_Height, out int height) || !int.TryParse(i_Width, out int width))
             {
                 isValidBoardSize = false;
             }
@@ -234,12 +238,31 @@ namespace B20_Ex02
             m_Board.SetCellState(row, column, updatedCellState);
         }
 
-        public bool IsMatch(string i_FirstCell, string i_SecondCell)
+        public bool CheckForMatch(string i_FirstMove, string i_SecondMove)
+        {
+            bool isMatch = this.isMatch(i_FirstMove, i_SecondMove);
+
+            if (isMatch)
+            {
+                m_HiddenPairCellsAmount--;
+                m_CurrentPlayer.Score++;
+            }
+            else
+            {
+                ToggleCellState(i_FirstMove);
+                ToggleCellState(i_SecondMove);
+                togglePlayer();
+            }
+
+            return isMatch;
+        }
+
+        private bool isMatch(string i_FirstCell, string i_SecondCell)
         {
             return m_Board[convertRowCharToInt(i_FirstCell[1]), convertColumnCharToInt(i_FirstCell[0])] == m_Board[convertRowCharToInt(i_SecondCell[1]), convertColumnCharToInt(i_SecondCell[0])];
         }
 
-        public void TogglePlayer()
+        private void togglePlayer()
         {
             m_CurrentPlayer = m_CurrentPlayer == Player1 ? Player2 : Player1;
         }
@@ -276,11 +299,6 @@ namespace B20_Ex02
             int winnerScore = Math.Max(r_Player1.Score, r_Player2.Score);
 
             return Player1.Score == winnerScore ? Player1 : Player2;
-        }
-
-        private bool areAllCellsVisible()
-        {
-            return m_HiddenPairCellsAmount == 0;
         }
 
         public bool IsGameOver()
