@@ -8,17 +8,19 @@ namespace B20_Ex02
         private readonly Player r_Player1;
         private readonly Player r_Player2;
         private readonly eGameMode r_GameMode;
+        private AI m_AI;
         private eGameStatus m_GameStatus;
         private Player m_CurrentPlayer;
         private GameBoard m_Board;
         private int m_HiddenPairCellsAmount;
         internal static readonly Random sr_RandGenerator = new Random();
         
-        public GameLogic(Player i_Player1, Player i_Player2, eGameMode i_GameGameMode)
+        public GameLogic(Player i_Player1, Player i_Player2, eGameMode i_GameMode)
         {
             r_Player1 = i_Player1;
             r_Player2 = i_Player2;
-            r_GameMode = i_GameGameMode;
+            r_GameMode = i_GameMode;
+            m_AI = null;
             m_GameStatus = eGameStatus.InProcess;
             m_CurrentPlayer = i_Player1;
             m_Board = null;
@@ -53,14 +55,6 @@ namespace B20_Ex02
             get
             {
                 return m_Board;
-            }
-        }
-
-        public eGameMode GameMode
-        {
-            get
-            {
-                return r_GameMode;
             }
         }
 
@@ -99,22 +93,9 @@ namespace B20_Ex02
             {
                 return m_CurrentPlayer;
             }
-
-            set
-            {
-                m_CurrentPlayer = value;
-            }
         }
 
-        public int HiddenPairCellsAmount
-        {
-            get
-            {
-                return m_HiddenPairCellsAmount;
-            }
-        }
-
-        public static bool IsValidName(string i_NameToCheck)
+        public static bool IsValidPlayerName(string i_NameToCheck)
         {
             return string.IsNullOrEmpty(i_NameToCheck) == false;
         }
@@ -138,6 +119,11 @@ namespace B20_Ex02
         {
             m_Board = new GameBoard(i_Height, i_Width);
             m_HiddenPairCellsAmount = (i_Height * i_Width) / 2;
+
+            if (r_GameMode == eGameMode.PlayerVsComputer)
+            {
+                m_AI = new AI(m_Board.CreateCellPositionsList());
+            }
         }
 
         public bool IsValidMove(string i_CellToCheck, out ePlayerMoveStatus o_Status)
@@ -238,28 +224,35 @@ namespace B20_Ex02
             m_Board.SetCellState(row, column, updatedCellState);
         }
 
-        public bool CheckForMatch(string i_FirstMove, string i_SecondMove)
+        public bool CheckForMatch(string i_FirstMoveStr, string i_SecondMoveStr)
         {
-            bool isMatch = this.isMatch(i_FirstMove, i_SecondMove);
+            Position firstPosition = new Position(convertRowCharToInt(i_FirstMoveStr[1]), convertColumnCharToInt(i_FirstMoveStr[0]));
+            Position secondPosition = new Position(convertRowCharToInt(i_SecondMoveStr[1]), convertColumnCharToInt(i_SecondMoveStr[0]));
+            bool areContentsMatch = this.arePositionContentsMatch(firstPosition, secondPosition);
 
-            if (isMatch)
+            if (areContentsMatch)
             {
                 m_HiddenPairCellsAmount--;
                 m_CurrentPlayer.Score++;
             }
             else
             {
-                ToggleCellState(i_FirstMove);
-                ToggleCellState(i_SecondMove);
+                ToggleCellState(i_FirstMoveStr);
+                ToggleCellState(i_SecondMoveStr);
                 togglePlayer();
             }
 
-            return isMatch;
+            if (r_GameMode == eGameMode.PlayerVsComputer)
+            {
+                m_AI.UpdateDataAccordingToPairing(areContentsMatch, firstPosition, secondPosition);
+            }
+
+            return areContentsMatch;
         }
 
-        private bool isMatch(string i_FirstCell, string i_SecondCell)
-        {
-            return m_Board[convertRowCharToInt(i_FirstCell[1]), convertColumnCharToInt(i_FirstCell[0])] == m_Board[convertRowCharToInt(i_SecondCell[1]), convertColumnCharToInt(i_SecondCell[0])];
+        private bool arePositionContentsMatch(Position i_FirstPosition, Position i_SecondPosition)
+        { 
+            return m_Board[i_FirstPosition.Row, i_FirstPosition.Column] == m_Board[i_SecondPosition.Row, i_SecondPosition.Column];
         }
 
         private void togglePlayer()
@@ -269,7 +262,7 @@ namespace B20_Ex02
 
         public void ResetGame()
         {
-            m_CurrentPlayer = GetWinner();
+            m_CurrentPlayer = Player1;
             Player1.Score = 0;
             Player2.Score = 0;
             m_GameStatus = eGameStatus.InProcess;
@@ -277,21 +270,51 @@ namespace B20_Ex02
 
         public string ChooseComputerMove()
         {
-            int randomRow, randomColumn;
             StringBuilder computerMove = new StringBuilder();
+            Position randPosition;
 
-            while (true)
+            if (m_AI.IsFirstMove)
             {
-                randomRow = sr_RandGenerator.Next(0, m_Board.Height);
-                randomColumn = sr_RandGenerator.Next(0, m_Board.Width);
-                if (!m_Board.Board[randomRow, randomColumn].Visible)
+               randPosition = m_AI.ChooseRandomHiddenCellPosition();
+               m_AI.RemovePositionFromHiddenCellPositions(randPosition);
+               m_AI.FirstMove = randPosition;
+            }
+            else
+            {
+                Position? pairPosition = findPairPositionInAI();
+                if (pairPosition == null)
                 {
-                    computerMove.Append(convertColumnIntToChar(randomColumn)).Append(convertRowIntToChar(randomRow));
-                    break;
+                    randPosition = m_AI.ChooseRandomHiddenCellPosition();
+                }
+                else
+                {
+                    randPosition = (Position)pairPosition;
                 }
             }
 
+            m_AI.IsFirstMove = !m_AI.IsFirstMove;
+            computerMove.Append(convertColumnIntToChar(randPosition.Column)).Append(convertRowIntToChar(randPosition.Row));
+
             return computerMove.ToString();
+        }
+
+        private Position? findPairPositionInAI()
+        {
+            Position? pairPosition = null;
+
+            if (m_AI.FirstMove != null)
+            {
+                foreach (Position knownCellPosition in m_AI.KnownCellPositions)
+                {
+                    if (knownCellPosition != m_AI.FirstMove && arePositionContentsMatch((Position)m_AI.FirstMove, knownCellPosition))
+                    {
+                        pairPosition = knownCellPosition;
+                        break;
+                    }
+                }
+            }
+
+            return pairPosition;
         }
 
         public Player GetWinner()

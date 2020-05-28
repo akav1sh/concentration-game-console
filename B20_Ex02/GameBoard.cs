@@ -58,7 +58,7 @@ namespace B20_Ex02
         private void initializeBoard()
         {
             List<char> cellContents = createCellsContentsList();
-            List<Position> cellPositions = createCellPositionsList();
+            List<Position> cellPositions = CreateCellPositionsList();
             int randContentIndex;
             char randContentToAdd;
 
@@ -78,7 +78,7 @@ namespace B20_Ex02
             int row = i_CellPositions[randPosition].Row;
             int column = i_CellPositions[randPosition].Column;
 
-            r_Board[row, column] = new Cell<char>(i_ContentToAdd, new Position(row, column));
+            r_Board[row, column] = new Cell<char>(i_ContentToAdd);
             i_CellPositions.RemoveAt(randPosition);
         }
 
@@ -88,15 +88,15 @@ namespace B20_Ex02
             List<char> cellContents = new List<char>(k_UpperCaseLettersAmount);
             char letter = 'A';
 
-            for (int i = 0; i < cellContents.Capacity; i++, letter++)
+            for (int i = 0; i < cellContents.Capacity; i++)
             {
-                cellContents.Add(letter);
+                cellContents.Add(letter++);
             }
 
             return cellContents;
         }
 
-        private List<Position> createCellPositionsList()
+        public List<Position> CreateCellPositionsList()
         {
             List<Position> cellPositions = new List<Position>(r_Height * r_Width);
 
