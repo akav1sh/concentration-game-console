@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Drawing;
 
 namespace B20_Ex02
 {
@@ -226,8 +227,8 @@ namespace B20_Ex02
 
         public bool CheckForMatch(string i_FirstMoveStr, string i_SecondMoveStr)
         {
-            Position firstPosition = new Position(convertRowCharToInt(i_FirstMoveStr[1]), convertColumnCharToInt(i_FirstMoveStr[0]));
-            Position secondPosition = new Position(convertRowCharToInt(i_SecondMoveStr[1]), convertColumnCharToInt(i_SecondMoveStr[0]));
+            Point firstPosition = new Point(convertColumnCharToInt(i_FirstMoveStr[0]), convertRowCharToInt(i_FirstMoveStr[1]));
+            Point secondPosition = new Point(convertColumnCharToInt(i_SecondMoveStr[0]), convertRowCharToInt(i_SecondMoveStr[1]));
             bool areContentsMatch = this.arePositionContentsMatch(firstPosition, secondPosition);
 
             if (areContentsMatch)
@@ -250,9 +251,9 @@ namespace B20_Ex02
             return areContentsMatch;
         }
 
-        private bool arePositionContentsMatch(Position i_FirstPosition, Position i_SecondPosition)
+        private bool arePositionContentsMatch(Point i_FirstPosition, Point i_SecondPosition)
         { 
-            return m_Board[i_FirstPosition.Row, i_FirstPosition.Column] == m_Board[i_SecondPosition.Row, i_SecondPosition.Column];
+            return m_Board[i_FirstPosition.Y, i_FirstPosition.X] == m_Board[i_SecondPosition.Y, i_SecondPosition.X];
         }
 
         private void togglePlayer()
@@ -271,7 +272,7 @@ namespace B20_Ex02
         public string ChooseComputerMove()
         {
             StringBuilder computerMove = new StringBuilder();
-            Position randPosition;
+            Point randPosition;
 
             if (m_AI.IsFirstMove)
             {
@@ -281,32 +282,32 @@ namespace B20_Ex02
             }
             else
             {
-                Position? pairPosition = findPairPositionInAI();
+                Point? pairPosition = findPairPositionInAI();
                 if (pairPosition == null)
                 {
                     randPosition = m_AI.ChooseRandomHiddenCellPosition();
                 }
                 else
                 {
-                    randPosition = (Position)pairPosition;
+                    randPosition = (Point)pairPosition;
                 }
             }
 
             m_AI.IsFirstMove = !m_AI.IsFirstMove;
-            computerMove.Append(convertColumnIntToChar(randPosition.Column)).Append(convertRowIntToChar(randPosition.Row));
+            computerMove.Append(convertColumnIntToChar(randPosition.X)).Append(convertRowIntToChar(randPosition.Y));
 
             return computerMove.ToString();
         }
 
-        private Position? findPairPositionInAI()
+        private Point? findPairPositionInAI()
         {
-            Position? pairPosition = null;
+            Point? pairPosition = null;
 
             if (m_AI.FirstMove != null)
             {
-                foreach (Position knownCellPosition in m_AI.KnownCellPositions)
+                foreach (Point knownCellPosition in m_AI.KnownCellPositions)
                 {
-                    if (knownCellPosition != m_AI.FirstMove && arePositionContentsMatch((Position)m_AI.FirstMove, knownCellPosition))
+                    if (knownCellPosition != m_AI.FirstMove && arePositionContentsMatch((Point)m_AI.FirstMove, knownCellPosition))
                     {
                         pairPosition = knownCellPosition;
                         break;

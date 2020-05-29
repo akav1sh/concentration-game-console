@@ -39,13 +39,13 @@
     <Compile Include="GameBoard.cs" />
     <Compile Include="GameLogic.cs" />
     <Compile Include="Player.cs" />
-    <Compile Include="Position.cs" />
     <Compile Include="Program.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Ex02.ConsoleUtils">
       <HintPath>C:\Temp\Ex02.ConsoleUtils.dll</HintPath>
     </Reference>
+    <Reference Include="System.Drawing" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

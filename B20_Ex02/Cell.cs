@@ -1,17 +1,17 @@
 ﻿namespace B20_Ex02
 {
-    public class Cell<T>
+    internal class Cell<T>
     {
         private readonly T r_Content;
         private bool m_IsVisible;
 
-        public Cell(T i_Content)
+        internal Cell(T i_Content)
         {
             r_Content = i_Content;
             m_IsVisible = false;
         }
 
-        public T Content
+        internal T Content
         {
             get
             {
@@ -19,7 +19,7 @@
             }
         }
 
-        public bool Visible
+        internal bool Visible
         {
             get
             {

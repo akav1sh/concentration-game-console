@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Drawing;
 
 namespace B20_Ex02
 {
@@ -18,7 +19,7 @@ namespace B20_Ex02
             initializeBoard();
         }
 
-        public Cell<char>[,] Board
+        internal Cell<char>[,] Board
         {
             get
             {
@@ -50,7 +51,7 @@ namespace B20_Ex02
             }
         }
 
-        public void SetCellState(int i_Row, int i_Column, bool i_State)
+        internal void SetCellState(int i_Row, int i_Column, bool i_State)
         {
             r_Board[i_Row, i_Column].Visible = i_State;
         }
@@ -58,7 +59,7 @@ namespace B20_Ex02
         private void initializeBoard()
         {
             List<char> cellContents = createCellsContentsList();
-            List<Position> cellPositions = CreateCellPositionsList();
+            List<Point> cellPositions = CreateCellPositionsList();
             int randContentIndex;
             char randContentToAdd;
 
@@ -72,11 +73,11 @@ namespace B20_Ex02
             }
         }
 
-        private void addRandomContentToRandomCell(List<Position> i_CellPositions, char i_ContentToAdd)
+        private void addRandomContentToRandomCell(List<Point> i_CellPositions, char i_ContentToAdd)
         {
             int randPosition = GameLogic.sr_RandGenerator.Next(0, i_CellPositions.Count);
-            int row = i_CellPositions[randPosition].Row;
-            int column = i_CellPositions[randPosition].Column;
+            int row = i_CellPositions[randPosition].Y;
+            int column = i_CellPositions[randPosition].X;
 
             r_Board[row, column] = new Cell<char>(i_ContentToAdd);
             i_CellPositions.RemoveAt(randPosition);
@@ -96,15 +97,15 @@ namespace B20_Ex02
             return cellContents;
         }
 
-        public List<Position> CreateCellPositionsList()
+        internal List<Point> CreateCellPositionsList()
         {
-            List<Position> cellPositions = new List<Position>(r_Height * r_Width);
+            List<Point> cellPositions = new List<Point>(r_Height * r_Width);
 
             for (int i = 0; i < r_Height; i++)
             {
                 for (int j = 0; j < r_Width; j++)
                 {
-                    cellPositions.Add(new Position(i, j));
+                    cellPositions.Add(new Point(j, i));
                 }
             }
 

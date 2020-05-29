@@ -1,23 +1,24 @@
 ﻿using System.Collections.Generic;
+using System.Drawing;
 
 namespace B20_Ex02
 {
     internal class AI
     {
-        private List<Position> m_HiddenCellPositions;
-        private List<Position> m_KnownCellPositions;
+        private List<Point> m_HiddenCellPositions;
+        private List<Point> m_KnownCellPositions;
         private bool m_IsFirstMove;
-        private Position? m_FirstMove;
+        private Point? m_FirstMove;
 
-        public AI(List<Position> i_CellPositions)
+        internal AI(List<Point> i_CellPositions)
         {
             m_HiddenCellPositions = i_CellPositions;
-            m_KnownCellPositions = new List<Position>(i_CellPositions.Count);
+            m_KnownCellPositions = new List<Point>(i_CellPositions.Count);
             m_IsFirstMove = true;
             m_FirstMove = null;
         }
 
-        public List<Position> KnownCellPositions
+        internal List<Point> KnownCellPositions
         {
             get
             {
@@ -25,7 +26,7 @@ namespace B20_Ex02
             }
         }
 
-        public List<Position> HiddenCellPositions
+        internal List<Point> HiddenCellPositions
         {
             get
             {
@@ -33,7 +34,7 @@ namespace B20_Ex02
             }
         }
 
-        public bool IsFirstMove
+        internal bool IsFirstMove
         {
             get
             {
@@ -46,7 +47,7 @@ namespace B20_Ex02
             }
         }
 
-        public Position? FirstMove
+        internal Point? FirstMove
         {
             get
             {
@@ -59,12 +60,12 @@ namespace B20_Ex02
             }
         }
 
-        public Position ChooseRandomHiddenCellPosition()
+        internal Point ChooseRandomHiddenCellPosition()
         {
             return m_HiddenCellPositions[GameLogic.sr_RandGenerator.Next(0, m_HiddenCellPositions.Count)];
         }
 
-        private void addPositionToKnownCellPositions(Position i_Position)
+        private void addPositionToKnownCellPositions(Point i_Position)
         {
             if (!m_KnownCellPositions.Contains(i_Position))
             {
@@ -72,7 +73,7 @@ namespace B20_Ex02
             }
         }
 
-        private void addPositionToHiddenCellPositions(Position i_Position)
+        private void addPositionToHiddenCellPositions(Point i_Position)
         {
             if (!m_HiddenCellPositions.Contains(i_Position))
             {
@@ -80,17 +81,17 @@ namespace B20_Ex02
             }
         }
 
-        public void RemovePositionFromHiddenCellPositions(Position i_Position)
+        internal void RemovePositionFromHiddenCellPositions(Point i_Position)
         {
             m_HiddenCellPositions.Remove(i_Position);
         }
 
-        private void removePositionFromKnownCellPositions(Position i_Position)
+        private void removePositionFromKnownCellPositions(Point i_Position)
         {
             m_KnownCellPositions.Remove(i_Position);
         }
 
-        public void UpdateDataAccordingToPairing(bool i_AreContentsMatch, Position i_FirstPosition, Position i_SecondPosition)
+        internal void UpdateDataAccordingToPairing(bool i_AreContentsMatch, Point i_FirstPosition, Point i_SecondPosition)
         {
            RemovePositionFromHiddenCellPositions(i_FirstPosition);
            RemovePositionFromHiddenCellPositions(i_SecondPosition);

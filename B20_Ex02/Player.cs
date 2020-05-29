@@ -42,7 +42,7 @@
                 return m_Score;
             }
 
-            set
+            internal set
             {
                 m_Score = value;
             }

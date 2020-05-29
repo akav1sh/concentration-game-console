@@ -191,7 +191,7 @@ Environment.NewLine);
 
             while (!isValidBoardSize)
             {
-                Console.WriteLine("Please enter the board size you prefer (minimum 4x4, maximum 6x6, even amount of cells):");
+                Console.WriteLine("Please enter the board size you prefer (minimum {0}x{0}, maximum {1}x{1}, even amount of cells):", GameBoard.k_MinHeightOrWidth, GameBoard.k_MaxHeightOrWidth);
                 Console.Write("Height: ");
                 string height = Console.ReadLine();
                 Console.Write("Width: ");
@@ -259,7 +259,7 @@ Environment.NewLine);
 
             do
             {
-                Console.Write($"{i_MsgToDisplay} (for example: \"A4\") or press \"Q\" to exit: ");
+                Console.Write($"{i_MsgToDisplay} (for example: \"A1\") or press \"Q\" to exit: ");
                 moveFromPlayer = Console.ReadLine().Trim();
                 isValidMove = m_GameLogic.IsValidMove(moveFromPlayer, out GameLogic.ePlayerMoveStatus moveStatus);
 
