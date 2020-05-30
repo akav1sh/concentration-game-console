@@ -182,8 +182,8 @@ namespace B20_Ex02
             }
             else
             {
-                if (height < GameBoard.k_MinHeightOrWidth || height > GameBoard.k_MaxHeightOrWidth ||
-                    width < GameBoard.k_MinHeightOrWidth || width > GameBoard.k_MaxHeightOrWidth)
+                if (height < GameBoard.MinHeightOrWidth || height > GameBoard.MaxHeightOrWidth ||
+                    width < GameBoard.MinHeightOrWidth || width > GameBoard.MaxHeightOrWidth)
                 {
                     isValidBoardSize = false;
                 }

@@ -5,8 +5,8 @@ namespace B20_Ex02
 {
     public class GameBoard
     {
-        public const int k_MinHeightOrWidth = 4;
-        public const int k_MaxHeightOrWidth = 6;
+        private const int k_MinHeightOrWidth = 4;
+        private const int k_MaxHeightOrWidth = 6;
         private readonly int r_Height;
         private readonly int r_Width;
         private readonly Cell<char>[,] r_Board;
@@ -32,6 +32,22 @@ namespace B20_Ex02
             get
             {
                 return r_Board[i_Row, i_Column].Content;
+            }
+        }
+
+        public static int MinHeightOrWidth
+        {
+            get
+            {
+                return k_MinHeightOrWidth;
+            }
+        }
+
+        public static int MaxHeightOrWidth
+        {
+            get
+            {
+                return k_MaxHeightOrWidth;
             }
         }
 

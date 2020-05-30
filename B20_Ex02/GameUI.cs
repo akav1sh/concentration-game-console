@@ -191,7 +191,7 @@ Environment.NewLine);
 
             while (!isValidBoardSize)
             {
-                Console.WriteLine("Please enter the board size you prefer (minimum {0}x{0}, maximum {1}x{1}, even amount of cells):", GameBoard.k_MinHeightOrWidth, GameBoard.k_MaxHeightOrWidth);
+                Console.WriteLine("Please enter the board size you prefer (minimum {0}x{0}, maximum {1}x{1}, even amount of cells):", GameBoard.MinHeightOrWidth, GameBoard.MaxHeightOrWidth);
                 Console.Write("Height: ");
                 string height = Console.ReadLine();
                 Console.Write("Width: ");
