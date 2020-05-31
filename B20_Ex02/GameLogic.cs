@@ -117,6 +117,19 @@ namespace B20_Ex02
             }
         }
 
+        private bool isValidCellFormat(string i_CellToCheck)
+        {
+            return i_CellToCheck.Length == 2 && char.IsUpper(i_CellToCheck[0]) && char.IsDigit(i_CellToCheck[1]);
+        }
+
+        private bool areValidCellBounds(string i_CellToCheck)
+        {
+            int column = convertColumnCharToInt(i_CellToCheck[0]);
+            int row = convertRowCharToInt(i_CellToCheck[1]);
+
+            return column >= 0 && column < m_Board.Width && row >= 0 && row < m_Board.Height;
+        }
+
         public bool IsValidMove(string i_CellToCheck, out ePlayerMoveStatus o_Status)
         {
             bool isValidMove;
@@ -128,24 +141,21 @@ namespace B20_Ex02
             }
             else
             {
-                if (i_CellToCheck.Length != 2 || !char.IsUpper(i_CellToCheck[0]) || 
-                    !char.IsDigit(i_CellToCheck[1]))
+                if (!isValidCellFormat(i_CellToCheck))
                 {
                     isValidMove = false;
                     o_Status = ePlayerMoveStatus.InvalidCellFormat;
                 }
                 else
                 {
-                    int column = convertColumnCharToInt(i_CellToCheck[0]);
-                    int row = convertRowCharToInt(i_CellToCheck[1]);
-                    if (column < 0 || column > m_Board.Width - 1 || row < 0 || row > m_Board.Height - 1)
+                    if (!areValidCellBounds(i_CellToCheck))
                     {
                         isValidMove = false;
                         o_Status = ePlayerMoveStatus.InvalidCellBounds;
                     }
                     else
                     {
-                        if (m_Board.Board[row, column].Visible)
+                        if (IsCellVisible(convertRowCharToInt(i_CellToCheck[1]), convertColumnCharToInt(i_CellToCheck[0])))
                         {
                             isValidMove = false;
                             o_Status = ePlayerMoveStatus.VisibleCell;
@@ -162,6 +172,16 @@ namespace B20_Ex02
             return isValidMove;
         }
 
+        private bool areValidBoardHeightAndWidth(int i_Height, int i_Width)
+        {
+            return i_Height >= GameBoard.MinHeightOrWidth && i_Height <= GameBoard.MaxHeightOrWidth && i_Width >= GameBoard.MinHeightOrWidth && i_Width <= GameBoard.MaxHeightOrWidth;
+        }
+
+        private bool isEvenAmountOfBoardCells(int i_Height, int i_Width)
+        {
+            return (i_Height * i_Width) % 2 == 0;
+        }
+
         public bool IsValidBoardSize(string i_Height, string i_Width)
         {
             bool isValidBoardSize;
@@ -172,14 +192,13 @@ namespace B20_Ex02
             }
             else
             {
-                if (height < GameBoard.MinHeightOrWidth || height > GameBoard.MaxHeightOrWidth ||
-                    width < GameBoard.MinHeightOrWidth || width > GameBoard.MaxHeightOrWidth)
+                if (!areValidBoardHeightAndWidth(height, width))
                 {
                     isValidBoardSize = false;
                 }
                 else
                 {
-                    isValidBoardSize = (height * width) % 2 == 0;
+                    isValidBoardSize = isEvenAmountOfBoardCells(height, width);
                 }
             }
 
