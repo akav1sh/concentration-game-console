@@ -96,16 +96,6 @@ namespace B20_Ex02
             }
         }
 
-        public static bool IsValidPlayerName(string i_NameToCheck)
-        {
-            return string.IsNullOrEmpty(i_NameToCheck) == false;
-        }
-
-        public static bool IsValidGameModeSelection(string i_GameMode)
-        {
-            return int.TryParse(i_GameMode, out int mode) && ((eGameMode)mode == eGameMode.PlayerVsPlayer || (eGameMode)mode == eGameMode.PlayerVsComputer);
-        }
-
         public bool IsCellVisible(int i_Row, int i_Column)
         {
             return m_Board.Board[i_Row, i_Column].Visible;

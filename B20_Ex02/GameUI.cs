@@ -292,21 +292,26 @@ Environment.NewLine);
 (2) Player Vs. Computer
 Your selection: ");
             string gameMode;
-            bool isValidGameMode;
+            bool isValidGameMode = false;
+            int parsedGameMode;
 
             do
             {
                 Console.Write(msgToUser);
                 gameMode = Console.ReadLine();
-                isValidGameMode = GameLogic.IsValidGameModeSelection(gameMode);
-                if (!isValidGameMode)
+
+                if (int.TryParse(gameMode, out parsedGameMode) && Enum.IsDefined(typeof(GameLogic.eGameMode), parsedGameMode))
+                {
+                    isValidGameMode = true;
+                }
+                else
                 {
                     Console.WriteLine("Wrong mode selected!{0}", Environment.NewLine);
                 }
             }
             while (!isValidGameMode);
 
-            return (GameLogic.eGameMode)int.Parse(gameMode);
+            return (GameLogic.eGameMode)parsedGameMode;
         }
 
         private string getPlayerName(string i_MsgToDisplay)
@@ -318,7 +323,7 @@ Your selection: ");
                 Console.Write(i_MsgToDisplay);
                 playerName = Console.ReadLine().TrimStart();
             }
-            while (!GameLogic.IsValidPlayerName(playerName));
+            while (string.IsNullOrEmpty(playerName));
 
             return playerName;
         }
