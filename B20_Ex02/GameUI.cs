@@ -163,7 +163,7 @@ Environment.NewLine);
                     Console.WriteLine("It's a tie!");
                     break;
                 default:
-                    Console.WriteLine($"Bye bye {m_GameLogic.CurrentPlayer.Name}... See you next time!");
+                    Console.WriteLine("Bye bye... See you next time!");
                     break;
             }
         }
