@@ -112,7 +112,7 @@ Environment.NewLine);
             return startAnotherGame;
         }
 
-        private string executeMove(string i_MsgToDisplay, out bool io_ToQuit)
+        private string executeMove(string i_MsgToDisplay, out bool o_ToQuit)
         {
             string move;
 
@@ -126,8 +126,8 @@ Environment.NewLine);
                 move = m_GameLogic.ChooseComputerMove();
             }
 
-            io_ToQuit = m_GameLogic.GameStatus == GameLogic.eGameStatus.QuitGame;
-            if (!io_ToQuit)
+            o_ToQuit = m_GameLogic.GameStatus == GameLogic.eGameStatus.QuitGame;
+            if (!o_ToQuit)
             {
                 m_GameLogic.ToggleCellState(move);
                 displayGameInfo();
@@ -168,12 +168,12 @@ Environment.NewLine);
             }
         }
 
-        private Player getOpponent(out GameLogic.eGameMode io_GameMode)
+        private Player getOpponent(out GameLogic.eGameMode o_GameMode)
         {
             Player opponent;
 
-            io_GameMode = getGameModeFromPlayer();
-            if (io_GameMode == GameLogic.eGameMode.PlayerVsPlayer)
+            o_GameMode = getGameModeFromPlayer();
+            if (o_GameMode == GameLogic.eGameMode.PlayerVsPlayer)
             {
                 opponent = new Player(getPlayerName("Please enter second player name: "), Player.ePlayerType.Human);
             }
